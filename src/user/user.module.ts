@@ -8,5 +8,6 @@ import { Encryptor } from '../other/encryptor';
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
   providers: [UserService, Encryptor],
+  exports: [UserService],
 })
 export class UserModule {}

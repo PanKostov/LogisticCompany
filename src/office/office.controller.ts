@@ -1,6 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param } from '@nestjs/common';
 import { OfficeService } from './office.service';
 import { EmployeeType } from 'src/employee/employee.type';
+import { Office } from './office.entity';
 
 @Controller('office')
 export class OfficeController {
@@ -39,4 +40,14 @@ export class OfficeController {
       body.type,
     );
   }
+
+  @Patch('/update/:id')
+  async updateOffice(
+    @Param('id') id: string,
+    @Body()
+    body: Partial<Office>,
+  ) {
+    return await this.officeService.updateOffice(parseInt(id), body);
+  }
+  //
 }

@@ -8,6 +8,7 @@ import { Employee } from './employee/employee.entity';
 import { Office } from './office/office.entity';
 import { OfficeModule } from './office/office.module';
 import { EmployeeModule } from './employee/employee.module';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { EmployeeModule } from './employee/employee.module';
     UserModule,
     OfficeModule,
     EmployeeModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { Employee } from '../employee/employee.entity';
 import { EmployeeType } from '../employee/employee.type';
 import { EmployeeService } from '../employee/employee.service';
+import { off } from 'process';
+import { of } from 'rxjs';
 
 @Injectable()
 export class OfficeService {
@@ -27,6 +29,15 @@ export class OfficeService {
     });
 
     return this.repo.save(office);
+  }
+
+  async updateOffice(id: number, updatedFields: Partial<Office>) {
+    const office = await this.repo.findOneBy({ id });
+    if (!office) {
+      throw new Error();
+    }
+    Object.assign(office, updatedFields);
+    return office;
   }
 
   async addEmployee(
