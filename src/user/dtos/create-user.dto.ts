@@ -1,26 +1,7 @@
-import {
-  Contains,
-  IsBoolean,
-  IsEmail,
-  IsString,
-  MinLength,
-  MaxLength,
-  Matches,
-  IsOptional,
-} from 'class-validator';
+import { IsBoolean, IsString, IsOptional } from 'class-validator';
+import { UserDto } from './user.dto';
 
-export class CreateUserDto {
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @MinLength(6)
-  @MaxLength(20)
-  //@Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-  //   message: 'password too weak',
-  //})
-  password: string;
-
+export class CreateUserDto extends UserDto {
   @IsString()
   @IsOptional()
   userName?: string;

@@ -30,7 +30,6 @@ export class UserController {
   @Post('/egn')
   @Throttle(3, 60)
   async findUserByEgn(@Body() body: { egn: string }) {
-    //da go namerq po egn v bazata
     const user = await this.usersService.findByEgn(body.egn);
     if (!user) {
       throw new NotFoundException('user not found');

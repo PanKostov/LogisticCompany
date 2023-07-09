@@ -3,6 +3,7 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthenticationService } from './authentication.service';
 import { CreateUserDto } from '../user/dtos/create-user.dto';
 import { User } from '../user/user.entity';
+import { UserDto } from 'src/user/dtos/user.dto';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -21,7 +22,7 @@ export class AuthenticationController {
 
   @Post('/login')
   @Throttle(3, 60)
-  signIn(@Body() body: CreateUserDto): Promise<User> {
+  signIn(@Body() body: UserDto): Promise<User> {
     return this.authService.signIn(body.email, body.password);
   }
 

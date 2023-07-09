@@ -19,15 +19,12 @@ export class AuthenticationService {
     const saltOrRounds = 10;
     const passwordHashed = await bcrypt.hash(password, saltOrRounds);
 
-    const egnEncrypted = await this.encryptor.encryptText(egn);
-
     let user = await this.userService.findByEmail(email);
 
     if (user) {
       throw new HttpException('User already exists', 400);
     }
     user = await this.userService.findByEgn(egn);
-    console.log(user);
     if (user) {
       throw new HttpException('User with such an egn already exists', 400);
     }
@@ -35,7 +32,7 @@ export class AuthenticationService {
     user = await this.userService.create(
       email,
       passwordHashed,
-      egnEncrypted,
+      egn,
       isEmployee,
     );
 

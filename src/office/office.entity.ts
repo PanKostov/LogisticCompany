@@ -12,13 +12,13 @@ export class Office {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   city: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   street: string;
 
-  @Column()
+  @Column({ type: 'int4' })
   streetNumber: number;
 
   @ManyToMany(() => Employee)

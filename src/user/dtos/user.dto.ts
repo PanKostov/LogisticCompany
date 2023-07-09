@@ -1,29 +1,14 @@
 import {
   IsEmail,
   IsString,
-  IsOptional,
-  IsBoolean,
   MinLength,
   MaxLength,
   Matches,
 } from 'class-validator';
 
-export class UpdateUserDto {
+export class UserDto {
   @IsEmail()
-  @IsOptional()
   email: string;
-
-  @IsString()
-  @IsOptional()
-  userName?: string;
-
-  @IsString()
-  @IsOptional()
-  egn: string;
-
-  @IsBoolean()
-  @IsOptional()
-  isEmployee: boolean;
 
   @IsString()
   @MinLength(6)
@@ -31,6 +16,5 @@ export class UpdateUserDto {
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'password too weak',
   })
-  @IsOptional()
   password: string;
 }
