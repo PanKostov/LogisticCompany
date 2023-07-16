@@ -69,4 +69,8 @@ export class EmployeeService {
       this.repo.remove(employee);
     });
   }
+
+  async getAllEmployees(): Promise<Employee[]> {
+    return await this.repo.find();
+  }
 }

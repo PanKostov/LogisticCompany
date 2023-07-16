@@ -1,5 +1,11 @@
 import { Encryptor } from 'src/other/encryptor';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -20,6 +26,12 @@ export class User {
 
   @Column({ type: 'boolean' })
   isEmployee: boolean;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 
   static from(source: Partial<User>): User {
     const entityModel = new User();

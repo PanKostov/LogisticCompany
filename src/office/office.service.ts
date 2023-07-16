@@ -62,14 +62,14 @@ export class OfficeService {
   async getOfficeById(id: number): Promise<Office> {
     const office = await this.repo.findOneBy({ id });
     if (!office) {
-      throw new NotFoundException('office does not exist');
+      throw new NotFoundException(`Office with id: ${id} does not exist`);
     }
     return office;
   }
   async showAllOfficesForCity(city: string): Promise<Office[]> {
     const offices = await this.repo.find({ where: { city } });
     if (offices.length === 0) {
-      throw new NotFoundException('offices from that city does not exist!');
+      throw new NotFoundException(`Offices from city: ${city} does not exist!`);
     }
 
     return offices;
@@ -108,6 +108,20 @@ export class OfficeService {
 
   async showOfficeEmployees(id: number): Promise<Employee[]> {
     return await this.employeeService.getOfficeEmployees(id);
+  }
+
+  async getOfficeEmployeeById(
+    officeId: number,
+    employeeId: number,
+  ): Promise<Employee | undefined> {
+    const officeEmployees = await this.showOfficeEmployees(officeId);
+    officeEmployees.forEach((employee) => {
+      if (employee.id === employeeId) {
+        return employee;
+      }
+    });
+
+    return undefined;
   }
 
   async deleteOfficeEmployee(

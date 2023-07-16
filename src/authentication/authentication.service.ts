@@ -45,8 +45,8 @@ export class AuthenticationService {
       throw new NotFoundException('User not found');
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       throw new HttpException('Invalid password', 400);
     }
 
