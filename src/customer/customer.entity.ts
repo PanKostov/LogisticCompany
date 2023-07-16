@@ -25,7 +25,7 @@ export class Customer {
   @OneToMany(() => Packet, (packet) => packet.sender)
   sentPackets: Packet[];
 
-  @OneToMany(() => Packet, (packet) => packet.reciever)
+  @OneToMany(() => Packet, (packet) => packet.receiver)
   recievedPackets: Packet[];
 
   @CreateDateColumn({ type: 'timestamp' })

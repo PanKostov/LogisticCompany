@@ -6,6 +6,7 @@ import { User } from '../user/user.entity';
 
 @Injectable()
 export class AuthenticationService {
+  private readonly SALT_OR_ROUNDS_VALUE = 10;
   constructor(private userService: UserService, private encryptor: Encryptor) {
     this.encryptor = new Encryptor('Password used to generate key');
   }
@@ -16,17 +17,17 @@ export class AuthenticationService {
     egn: string,
     isEmployee: boolean,
   ): Promise<User> {
-    const saltOrRounds = 10;
+    const saltOrRounds = this.SALT_OR_ROUNDS_VALUE;
     const passwordHashed = await bcrypt.hash(password, saltOrRounds);
 
     let user = await this.userService.findByEmail(email);
 
     if (user) {
-      throw new HttpException('User already exists', 400);
+      throw new HttpException(`User with email: ${email} already exists!`, 400);
     }
     user = await this.userService.findByEgn(egn);
     if (user) {
-      throw new HttpException('User with such an egn already exists', 400);
+      throw new HttpException('User with such an egn already exists!', 400);
     }
 
     user = await this.userService.create(
@@ -42,12 +43,12 @@ export class AuthenticationService {
   async signIn(email: string, password: string): Promise<User> {
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with email: ${email} not found!`);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new HttpException('Invalid password', 400);
+      throw new HttpException('Invalid password! ', 400);
     }
 
     return user;
@@ -60,7 +61,7 @@ export class AuthenticationService {
   ): Promise<User> {
     const user = await this.userService.findOne(id);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found!');
     }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
@@ -75,10 +76,10 @@ export class AuthenticationService {
       );
     }
 
-    const saltOrRounds = 10;
+    const saltOrRounds = this.SALT_OR_ROUNDS_VALUE;
     const passwordHashed = await bcrypt.hash(newPassword, saltOrRounds);
-
-    user.password = passwordHashed;
-    return this.userService.save(user);
+    return this.userService.updatePassword(id, { password: passwordHashed });
+    //user.password = passwordHashed;
+    //return this.userService.save(user);
   }
 }

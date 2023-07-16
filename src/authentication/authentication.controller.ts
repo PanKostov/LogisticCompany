@@ -9,6 +9,7 @@ import { UserDto } from 'src/user/dtos/user.dto';
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 
+  //TODO isEmployee to be changed only by employees
   @Post('/signup')
   @Throttle(3, 60)
   signUp(@Body() body: CreateUserDto): Promise<User> {

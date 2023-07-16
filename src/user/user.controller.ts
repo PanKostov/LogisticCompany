@@ -16,7 +16,7 @@ import { User } from './user.entity';
 @Controller('user')
 export class UserController {
   constructor(private readonly usersService: UserService) {}
-
+  //To be used only by employees untill last 2 methods
   @Get('/:id')
   @Throttle(3, 60)
   async findUser(@Param('id') id: string): Promise<User> {
@@ -45,16 +45,29 @@ export class UserController {
 
   @Delete('/:id')
   @Throttle(3, 60)
-  removeUser(@Param('id') id: string): Promise<User> {
-    return this.usersService.remove(parseInt(id));
+  async removeUser(@Param('id') id: string): Promise<User> {
+    return await this.usersService.remove(parseInt(id));
   }
 
   @Patch('/:id')
   @Throttle(3, 60)
-  updateUser(
+  async updateUser(
     @Param('id') id: string,
     @Body() body: UpdateUserDto,
   ): Promise<User> {
-    return this.usersService.update(parseInt(id), body);
+    return await this.usersService.update(parseInt(id), body);
   }
+
+  //Can be used only by the logged in user
+  // @Get()
+  // async getSentPacketsForUser() {
+  //   //get user from current session or use JWT??
+  //   return await this.usersService.sentPacketsForUser()
+  // }
+
+  // @Get()
+  // async getReceivedPacketsForUser() {
+  //   //get user from current session or use JWT??
+  //   return await this.usersService.receivedPacketsForUser()
+  // }
 }

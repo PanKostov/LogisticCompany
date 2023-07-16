@@ -86,7 +86,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.repo.remove(user);
+    return await this.repo.remove(user);
   }
 
   async save(user: User): Promise<User> {
@@ -126,7 +126,7 @@ export class UserService {
     return user.isEmployee;
   }
 
-  async findCustomerWithSameEgn(userId: number): Promise<Customer> {
+  private async findCustomerWithSameEgn(userId: number): Promise<Customer> {
     const userEgn = await this.getEgnOfUser(userId);
     const customer = await this.customerService.findByEgn(userEgn);
     if (!customer) {

@@ -23,17 +23,21 @@ export class Packet {
   @ManyToOne(() => Office, (office) => office.sentPackets)
   fromOffice: Office;
 
-  @ManyToOne(() => Customer, (customer) => customer.sentPackets)
+  @ManyToOne(() => Customer, (customer) => customer.sentPackets, {
+    eager: true,
+  })
   sender: Customer;
+
+  @ManyToOne(() => Customer, (customer) => customer.recievedPackets, {
+    eager: true,
+  })
+  receiver: Customer;
 
   @Column({ type: 'varchar', nullable: true })
   toAddress: string;
 
   @ManyToOne(() => Office, (office) => office.recievedPackets)
   toOffice: Office;
-
-  @ManyToOne(() => Customer, (customer) => customer.recievedPackets)
-  reciever: Customer;
 
   @Column({ type: 'numeric' })
   employeeId: number;

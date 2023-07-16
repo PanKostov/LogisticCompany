@@ -115,13 +115,10 @@ export class OfficeService {
     employeeId: number,
   ): Promise<Employee | undefined> {
     const officeEmployees = await this.showOfficeEmployees(officeId);
-    officeEmployees.forEach((employee) => {
-      if (employee.id === employeeId) {
-        return employee;
-      }
-    });
-
-    return undefined;
+    const employee = officeEmployees.find(
+      (employee) => employee.id == employeeId,
+    );
+    return employee;
   }
 
   async deleteOfficeEmployee(
