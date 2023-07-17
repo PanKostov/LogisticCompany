@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Customer } from './customer.entity';
 import { CustomerController } from './customer.controller';
 import { CustomerService } from './customer.service';
-import { Encryptor } from 'src/other/encryptor';
+import { Encryptor } from '../other/encryptor';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Customer])],

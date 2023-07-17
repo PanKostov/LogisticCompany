@@ -1,4 +1,3 @@
-import { Packet } from 'src/packet/packet.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,6 +7,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Encryptor } from '../other/encryptor';
+import { Packet } from '../packet/packet.entity';
+
 @Entity()
 export class Customer {
   @PrimaryGeneratedColumn()

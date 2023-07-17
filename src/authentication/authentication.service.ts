@@ -1,15 +1,13 @@
 import { Injectable, NotFoundException, HttpException } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
-import { Encryptor } from '../other/encryptor';
+import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 
 @Injectable()
 export class AuthenticationService {
   private readonly SALT_OR_ROUNDS_VALUE = 10;
-  constructor(private userService: UserService, private encryptor: Encryptor) {
-    this.encryptor = new Encryptor('Password used to generate key');
-  }
+
+  constructor(private userService: UserService) {}
 
   async signUp(
     email: string,
@@ -21,23 +19,21 @@ export class AuthenticationService {
     const passwordHashed = await bcrypt.hash(password, saltOrRounds);
 
     let user = await this.userService.findByEmail(email);
-
     if (user) {
       throw new HttpException(`User with email: ${email} already exists!`, 400);
     }
+
     user = await this.userService.findByEgn(egn);
     if (user) {
       throw new HttpException('User with such an egn already exists!', 400);
     }
 
-    user = await this.userService.create(
+    return await this.userService.create(
       email,
       passwordHashed,
       egn,
       isEmployee,
     );
-
-    return user;
   }
 
   async signIn(email: string, password: string): Promise<User> {
@@ -78,8 +74,7 @@ export class AuthenticationService {
 
     const saltOrRounds = this.SALT_OR_ROUNDS_VALUE;
     const passwordHashed = await bcrypt.hash(newPassword, saltOrRounds);
+
     return this.userService.updatePassword(id, { password: passwordHashed });
-    //user.password = passwordHashed;
-    //return this.userService.save(user);
   }
 }

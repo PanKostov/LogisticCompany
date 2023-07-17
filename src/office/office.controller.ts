@@ -47,14 +47,14 @@ export class OfficeController {
     return await this.officeService.deleteOffice(parseInt(id));
   }
 
-  @Get()
-  async getOfficesByCity(@Query('city') city: string): Promise<Office[]> {
-    return await this.officeService.showAllOfficesForCity(city);
-  }
-
   @Get(':id')
   async getOffice(@Param('id') id: string): Promise<Office> {
     return await this.officeService.getOfficeById(parseInt(id));
+  }
+
+  @Get()
+  async getOfficesByCity(@Query('city') city: string): Promise<Office[]> {
+    return await this.officeService.showAllOfficesForCity(city);
   }
 
   @Post('/employee')
@@ -95,9 +95,11 @@ export class OfficeController {
     );
   }
 
-  @Get('/employee/:id')
-  async getOfficeEmployees(@Param('id') id: string): Promise<Employee[]> {
-    return await this.officeService.showOfficeEmployees(parseInt(id));
+  @Get('/employee/:officeId')
+  async getOfficeEmployees(
+    @Param('officeId') officeId: string,
+  ): Promise<Employee[]> {
+    return await this.officeService.showOfficeEmployees(parseInt(officeId));
   }
 
   @Delete('/employee/:officeId/:employeeId')
@@ -108,6 +110,15 @@ export class OfficeController {
     return await this.officeService.deleteOfficeEmployee(
       parseInt(officeId),
       parseInt(employeeId),
+    );
+  }
+
+  @Delete('/employees')
+  async deleteAllEmployeesFromOffice(
+    @Param('officeId') officeId: string,
+  ): Promise<boolean> {
+    return await this.officeService.deleteAllOfficeEmployees(
+      parseInt(officeId),
     );
   }
 }

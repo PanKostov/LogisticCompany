@@ -17,13 +17,11 @@ export class OfficeService {
     city: string,
     street: string,
     streetNumber: number,
-    employees?: Employee[],
   ): Promise<Office> {
     const office = this.repo.create({
       city,
       street,
       streetNumber,
-      employees,
     });
 
     return this.repo.save(office);
@@ -52,9 +50,6 @@ export class OfficeService {
 
   async deleteOffice(id: number): Promise<Office> {
     const office = await this.getOfficeById(id);
-    if (!office) {
-      throw new NotFoundException('office does not exist');
-    }
     await this.employeeService.deleteAllOfficeEmployees(id);
     return this.repo.remove(office);
   }
@@ -66,6 +61,7 @@ export class OfficeService {
     }
     return office;
   }
+
   async showAllOfficesForCity(city: string): Promise<Office[]> {
     const offices = await this.repo.find({ where: { city } });
     if (offices.length === 0) {
@@ -127,5 +123,9 @@ export class OfficeService {
   ): Promise<Employee> {
     await this.getOfficeById(officeId);
     return await this.employeeService.deleteEmployee(employeeId);
+  }
+
+  async deleteAllOfficeEmployees(officeId: number): Promise<boolean> {
+    return await this.employeeService.deleteAllOfficeEmployees(officeId);
   }
 }

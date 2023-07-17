@@ -40,7 +40,7 @@ export class CustomerController {
   }
 
   @Post('/egn')
-  async findUserByEgn(@Body() body: { egn: string }) {
+  async findByEgn(@Body() body: { egn: string }) {
     const user = await this.customerService.findByEgn(body.egn);
     if (!user) {
       throw new NotFoundException('user not found');
@@ -49,7 +49,7 @@ export class CustomerController {
   }
 
   @Get('/egn/:id')
-  async getEgnOfUser(@Param('id') id: string): Promise<string> {
+  async getEgn(@Param('id') id: string): Promise<string> {
     return await this.customerService.getEgnOfCustomer(parseInt(id));
   }
 }

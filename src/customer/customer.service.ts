@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Customer } from './customer.entity';
 import { Repository } from 'typeorm';
+import { Customer } from './customer.entity';
 import { CustomerInterface } from './dtos/customer.interface';
 import { Packet } from '../packet/packet.entity';
 import { Encryptor } from '../other/encryptor';
@@ -22,16 +22,10 @@ export class CustomerService {
       customerInterface.egn,
     );
     const customer = this.repo.create(customerInterface);
-    if (!customer.sentPackets) {
-      customer.sentPackets = new Array<Packet>();
-    }
 
-    if (!customer.recievedPackets) {
-      customer.recievedPackets = new Array<Packet>();
-    }
-    console.log(await this.encryptor.encryptText(customerInterface.egn));
-    customer.sentPackets.push(customerInterface.sentPacket);
-    customer.recievedPackets.push(customerInterface.recievedPacket);
+    customer.sentPackets = new Array<Packet>();
+    customer.recievedPackets = new Array<Packet>();
+
     return this.repo.save(customer);
   }
 
@@ -53,7 +47,7 @@ export class CustomerService {
     return updatedEntity.raw[0];
   }
 
-  async findOne(id: number): Promise<Customer | undefined> {
+  async findOne(id: number): Promise<Customer> {
     const customer = await this.repo.findOneBy({ id });
     if (!customer) {
       throw new NotFoundException(`Customer with id: ${id} does not exist!`);

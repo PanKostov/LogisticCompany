@@ -20,10 +20,12 @@ export class EmployeeService {
       lastName,
       type,
     });
+
     if (!employee.offices) {
       employee.offices = new Array<Office>();
     }
     employee.offices.push(office);
+
     return await this.repo.save(employee);
   }
 
@@ -57,17 +59,21 @@ export class EmployeeService {
   async deleteEmployee(id: number): Promise<Employee> {
     const employee = await this.repo.findOneBy({ id });
     if (!employee) {
-      throw new NotFoundException('Employee does not exist');
+      throw new NotFoundException(`Employee with id: ${id} does not exist`);
     }
     return await this.repo.remove(employee);
   }
 
-  async deleteAllOfficeEmployees(officeId: number) {
+  async deleteAllOfficeEmployees(officeId: number): Promise<boolean> {
     const employees = await this.getOfficeEmployees(officeId);
 
     employees.forEach((employee) => {
       this.repo.remove(employee);
     });
+
+    const isDeleted = employees ? true : false;
+
+    return isDeleted;
   }
 
   async getAllEmployees(): Promise<Employee[]> {

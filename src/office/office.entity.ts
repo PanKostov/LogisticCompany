@@ -1,5 +1,3 @@
-import { Employee } from '../employee/employee.entity';
-import { Packet } from '../packet/packet.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,6 +8,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Employee } from '../employee/employee.entity';
+import { Packet } from '../packet/packet.entity';
 
 @Entity()
 export class Office {
