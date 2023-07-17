@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, HttpException } from '@nestjs/common';
-import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './user.entity';
 import { Encryptor } from '../other/encryptor';
 import { Packet } from '../packet/packet.entity';
 import { CustomerService } from '../customer/customer.service';

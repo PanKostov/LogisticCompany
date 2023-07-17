@@ -1,4 +1,4 @@
-import { Encryptor } from 'src/other/encryptor';
+import { Encryptor } from '../other/encryptor';
 import {
   Entity,
   PrimaryGeneratedColumn,

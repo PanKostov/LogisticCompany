@@ -1,5 +1,5 @@
-import { Customer } from 'src/customer/customer.entity';
-import { Office } from 'src/office/office.entity';
+import { Customer } from '../customer/customer.entity';
+import { Office } from '../office/office.entity';
 import {
   Entity,
   Column,

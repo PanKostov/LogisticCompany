@@ -8,9 +8,9 @@ import {
   Delete,
   NotFoundException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { Throttle } from '@nestjs/throttler';
 import { User } from './user.entity';
 
 @Controller('user')

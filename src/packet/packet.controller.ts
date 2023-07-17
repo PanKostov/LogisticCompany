@@ -13,7 +13,7 @@ export class PacketController {
     return await this.packetService.sendPacket(body);
   }
 
-  @Patch('/receiving/')
+  @Patch('/receiving')
   async receivePacket(
     @Body() body: { packageId: number; officeId: number },
   ): Promise<Packet> {

@@ -1,19 +1,17 @@
 import { createCipheriv, scrypt, createDecipheriv } from 'crypto';
 import { promisify } from 'util';
 import { randomBytes } from 'crypto';
-//import { Injectable } from '@nestjs/common';
 
 const RANDOM_BYTES = [
   0x43, 0x02, 0xbb, 0xc1, 0xac, 0xf7, 0xb5, 0x8f, 0x8c, 0x83, 0x55, 0x5a, 0x98,
   0x23, 0x82, 0x8f,
 ];
 
-//@Injectable()
 export class Encryptor {
-  //private static staticIv: Buffer = randomBytes(16);
   private static readonly staticIv: Buffer = Buffer.from(RANDOM_BYTES);
   private iv?: Buffer;
   private key: Buffer;
+
   constructor(private passwordKey: string, randomIv: boolean = false) {
     if (randomIv) {
       this.iv = randomBytes(16);

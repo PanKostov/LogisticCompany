@@ -1,5 +1,3 @@
-import { Office } from 'src/office/office.entity';
-
 export interface SendPackageInterface {
   senderId: number;
   receiverId: number;
