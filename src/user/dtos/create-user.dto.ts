@@ -8,7 +8,4 @@ export class CreateUserDto extends UserDto {
 
   @IsString()
   egn: string;
-
-  @IsBoolean()
-  isEmployee: boolean;
 }

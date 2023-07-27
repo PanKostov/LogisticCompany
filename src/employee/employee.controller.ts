@@ -3,6 +3,7 @@ import { EmployeeService } from './employee.service';
 import { EmployeeType } from './employee.type';
 import { Employee } from './employee.entity';
 
+//TO BE USED ONLY BY ADMINS
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}

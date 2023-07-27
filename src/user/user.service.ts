@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, HttpException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Encryptor } from '../other/encryptor';
@@ -95,7 +95,7 @@ export class UserService {
   }
 
   async findOne(id: number): Promise<User | undefined> {
-    const user = await this.repo.findOneBy({ id });
+    const user = await this.repo.findOneBy({ id: Equal(id) });
     return user?.decryptFields(this.encryptor);
   }
 
@@ -146,4 +146,6 @@ export class UserService {
 
     return await this.customerService.getReceivedPackets(customer.id);
   }
+
+  //new method - to give(admin) rights to a user
 }

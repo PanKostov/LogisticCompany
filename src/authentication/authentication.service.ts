@@ -9,12 +9,7 @@ export class AuthenticationService {
 
   constructor(private userService: UserService) {}
 
-  async signUp(
-    email: string,
-    password: string,
-    egn: string,
-    isEmployee: boolean,
-  ): Promise<User> {
+  async signUp(email: string, password: string, egn: string): Promise<User> {
     const saltOrRounds = this.SALT_OR_ROUNDS_VALUE;
     const passwordHashed = await bcrypt.hash(password, saltOrRounds);
 
@@ -28,12 +23,7 @@ export class AuthenticationService {
       throw new HttpException('User with such an egn already exists!', 400);
     }
 
-    return await this.userService.create(
-      email,
-      passwordHashed,
-      egn,
-      isEmployee,
-    );
+    return await this.userService.create(email, passwordHashed, egn, false);
   }
 
   async signIn(email: string, password: string): Promise<User> {
@@ -56,6 +46,7 @@ export class AuthenticationService {
     newPassword: string,
   ): Promise<User> {
     const user = await this.userService.findOne(id);
+
     if (!user) {
       throw new NotFoundException('User not found!');
     }

@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { UserAccess } from './user.access';
 
 @Entity()
 export class User {
@@ -26,6 +27,9 @@ export class User {
 
   @Column({ type: 'boolean' })
   isEmployee: boolean;
+
+  @Column({ enum: UserAccess, type: 'enum' })
+  type: UserAccess;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

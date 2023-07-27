@@ -17,6 +17,7 @@ import { Employee } from '../employee/employee.entity';
 export class OfficeController {
   constructor(private readonly officeService: OfficeService) {}
 
+  //For admins only
   @Post('/creation')
   createOffice(
     @Body()
@@ -33,6 +34,7 @@ export class OfficeController {
     );
   }
 
+  //For admins only
   @Patch('/update/:id')
   async updateOffice(
     @Param('id') id: string,
@@ -42,6 +44,7 @@ export class OfficeController {
     return await this.officeService.updateOffice(parseInt(id), body);
   }
 
+  //For admins only
   @Delete(':id')
   async deleteOffice(@Param('id') id: string): Promise<Office> {
     return await this.officeService.deleteOffice(parseInt(id));
@@ -57,6 +60,7 @@ export class OfficeController {
     return await this.officeService.showAllOfficesForCity(city);
   }
 
+  //For admins only
   @Post('/employee')
   async addEmployee(
     @Body()
@@ -75,6 +79,7 @@ export class OfficeController {
     );
   }
 
+  //For admins only
   @Patch('/employee')
   async updateEmployee(
     @Body()
@@ -102,6 +107,7 @@ export class OfficeController {
     return await this.officeService.showOfficeEmployees(parseInt(officeId));
   }
 
+  //For admins only
   @Delete('/employee/:officeId/:employeeId')
   async deleteOfficeEmployee(
     @Param('officeId') officeId: string,
@@ -113,6 +119,7 @@ export class OfficeController {
     );
   }
 
+  //For admins only
   @Delete('/employees')
   async deleteAllEmployeesFromOffice(
     @Param('officeId') officeId: string,

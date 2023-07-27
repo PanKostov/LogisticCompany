@@ -7,11 +7,14 @@ import {
   Patch,
   Delete,
   NotFoundException,
+  Session,
+  UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './user.entity';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -58,16 +61,15 @@ export class UserController {
     return await this.usersService.update(parseInt(id), body);
   }
 
-  //Can be used only by the logged in user
-  // @Get()
-  // async getSentPacketsForUser() {
-  //   //get user from current session or use JWT??
-  //   return await this.usersService.sentPacketsForUser()
-  // }
+  @Get('/sent-packets')
+  @UseGuards(AuthGuard)
+  async getSentPacketsForUser(@Session() session: { userId: number }) {
+    return await this.usersService.sentPacketsForUser(session.userId);
+  }
 
-  // @Get()
-  // async getReceivedPacketsForUser() {
-  //   //get user from current session or use JWT??
-  //   return await this.usersService.receivedPacketsForUser()
-  // }
+  @Get('/received-packets')
+  @UseGuards(AuthGuard)
+  async getReceivedPacketsForUser(@Session() session: { userId: number }) {
+    return await this.usersService.receivedPacketsForUser(session.userId);
+  }
 }
