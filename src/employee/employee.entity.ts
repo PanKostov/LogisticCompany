@@ -4,6 +4,8 @@ import {
   Column,
   ManyToMany,
   JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { EmployeeType } from './employee.type';
 import { Office } from '../office/office.entity';
@@ -13,25 +15,22 @@ export class Employee {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   firstName: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   lastName: string;
 
-  @Column()
+  @Column({ enum: EmployeeType, type: 'enum' })
   type: EmployeeType;
 
   @ManyToMany(() => Office, (office) => office.employees)
   @JoinTable({ name: 'office_employees' })
   offices: Office[];
 
-  // async addOffice(officeId: number): Promise<Employee> {
-  //   const office = await Office.findOneBy({ id: officeId });
-  //   if (!office) {
-  //     throw new Error('Office not found');
-  //   }
-  //   this.offices.push(office);
-  //   return this;
-  // }
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 }

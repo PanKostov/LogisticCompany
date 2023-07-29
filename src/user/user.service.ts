@@ -1,21 +1,20 @@
 import { Injectable, NotFoundException, HttpException } from '@nestjs/common';
-import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
+import { User } from './user.entity';
 import { Encryptor } from '../other/encryptor';
-import { randomBytes } from 'crypto';
+import { Packet } from '../packet/packet.entity';
+import { CustomerService } from '../customer/customer.service';
+import { Customer } from '../customer/customer.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private repo: Repository<User>,
+    private customerService: CustomerService,
     private encryptor: Encryptor,
   ) {
-    this.encryptor = new Encryptor(
-      randomBytes(16),
-      'Password used to generate key',
-    );
+    this.encryptor = new Encryptor('Password used to generate key');
   }
 
   async create(
@@ -23,92 +22,130 @@ export class UserService {
     password: string,
     egn: string,
     isEmployee: boolean,
-  ) {
-    const saltOrRounds = 10;
-    const passwordHashed = await bcrypt.hash(password, saltOrRounds);
-
+  ): Promise<User> {
     const egnEncrypted = await this.encryptor.encryptText(egn);
-
     const user = this.repo.create({
       email,
-      password: passwordHashed,
+      password,
       egn: egnEncrypted,
       isEmployee,
     });
 
-    return this.repo.save(user);
+    return await this.repo.save(user);
   }
 
-  async login(email: string, password: string) {
-    const user = await this.repo.findOneBy({ email });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new HttpException('Invalid password', 400);
-    }
-
-    return user;
-  }
-
-  findOne(id: number) {
-    return this.repo.findOneBy({ id });
-  }
-
-  async findByEgn(egn: string) {
-    const encryptedEgn = await this.encryptor.encryptText(egn);
-    return this.repo.findOneBy({ egn: encryptedEgn });
-  }
-
-  async getEgnOfUser(id: number) {
-    const user = await this.findOne(id);
-    return this.encryptor.decryptText(user.egn);
-  }
-
-  async update(id: number, attrs: Partial<User>) {
+  async update(id: number, attrs: Partial<User>): Promise<User> {
     if (attrs.password) {
       throw new HttpException("You can't change password here", 400);
     }
+
+    const updatedEntity = await this.repo
+      .createQueryBuilder()
+      .update(User)
+      .set({
+        ...(attrs.email && { email: attrs.email }),
+        ...(attrs.userName && { userName: attrs.userName }),
+      })
+      .where({ id })
+      .returning('*')
+      .execute();
+
+    return updatedEntity.raw[0];
+  }
+
+  async updatePassword(id: number, attrs: Partial<User>): Promise<User> {
+    const updatedEntity = await this.repo
+      .createQueryBuilder()
+      .update(User)
+      .set({
+        ...(attrs.password && { password: attrs.password }),
+      })
+      .where({ id })
+      .returning('*')
+      .execute();
+
+    return updatedEntity.raw[0];
+  }
+
+  async updateType(id: number, isEmployee: boolean): Promise<User> {
+    const updatedEntity = await this.repo
+      .createQueryBuilder()
+      .update(User)
+      .set({
+        ...(isEmployee && { isEmployee }),
+      })
+      .where({ id })
+      .returning('*')
+      .execute();
+
+    return updatedEntity.raw[0];
+  }
+
+  async remove(id: number): Promise<User> {
     const user = await this.findOne(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    Object.assign(user, attrs);
-    return this.repo.save(user);
+    return await this.repo.remove(user);
   }
 
-  async updatePassword(id: number, oldPassword: string, newPassword: string) {
+  async save(user: User): Promise<User> {
+    const encryptedUser = await user.encryptFields(this.encryptor);
+    return await this.repo.save(encryptedUser);
+  }
+
+  async findOne(id: number): Promise<User | undefined> {
+    const user = await this.repo.findOneBy({ id: Equal(id) });
+    return user?.decryptFields(this.encryptor);
+  }
+
+  async findByEmail(email: string): Promise<User | undefined> {
+    const user = await this.repo.findOneBy({ email });
+    return user?.decryptFields(this.encryptor);
+  }
+
+  async findByEgn(egn: string): Promise<User | undefined> {
+    const encryptedEgn = await this.encryptor.encryptText(egn);
+    const user = await this.repo.findOneBy({ egn: encryptedEgn });
+    return user?.decryptFields(this.encryptor);
+  }
+
+  async getEgnOfUser(id: number): Promise<string> {
     const user = await this.findOne(id);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('user not found');
     }
-
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch) {
-      throw new HttpException('Old password does not mach!', 400);
-    }
-
-    if (oldPassword === newPassword) {
-      throw new HttpException(
-        'New password must be different from the old password.',
-        400,
-      );
-    }
-
-    const saltOrRounds = 10;
-    const passwordHashed = await bcrypt.hash(newPassword, saltOrRounds);
-
-    user.password = passwordHashed;
-    return this.repo.save(user);
+    return user.egn;
   }
 
-  async remove(id: number) {
+  async isEmployee(id: number): Promise<boolean> {
     const user = await this.findOne(id);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('user not found');
     }
-    return this.repo.remove(user);
+    return user.isEmployee;
   }
+
+  private async findCustomerWithSameEgn(userId: number): Promise<Customer> {
+    const userEgn = await this.getEgnOfUser(userId);
+    const customer = await this.customerService.findByEgn(userEgn);
+    if (!customer) {
+      throw new NotFoundException('customer not found');
+    }
+    return customer;
+  }
+
+  async sentPacketsForUser(id: number): Promise<Packet[]> {
+    const customer = await this.findCustomerWithSameEgn(id);
+
+    return await this.customerService.getSentPackets(customer.id);
+  }
+
+  async receivedPacketsForUser(id: number): Promise<Packet[]> {
+    const customer = await this.findCustomerWithSameEgn(id);
+
+    return await this.customerService.getReceivedPackets(customer.id);
+  }
+
+  //new method - to give(admin) rights to a user
 }
