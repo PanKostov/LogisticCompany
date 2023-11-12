@@ -6,54 +6,79 @@ import {
   Get,
   Param,
   Body,
-  NotFoundException,
+  HttpException,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { Customer } from './customer.entity';
-import { CustomerInterface } from './dtos/customer.interface';
+import { CustomerDto } from './dtos/customer.dto';
+import { UpdateCustomerDto } from './dtos/update-customer.dto';
 
-//ONLY FOR ADMINS
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Post()
-  async createCustomer(@Body() body: CustomerInterface): Promise<Customer> {
-    return await this.customerService.createCustomer(body);
+  async createCustomer(@Body() body: CustomerDto): Promise<Customer> {
+    try {
+      return await this.customerService.createCustomer(body);
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
-  @Patch()
+  @Patch(':id')
   async updateCustomer(
     @Param('id') id: string,
-    @Body() body: Partial<Customer>,
+    @Body() body: UpdateCustomerDto,
   ): Promise<Customer> {
-    return await this.updateCustomer(id, body);
+    try {
+      return await this.customerService.updateCustomer(parseInt(id), body);
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
   @Delete(':id')
   async deleteCustomer(@Param('id') id: string): Promise<Customer> {
-    return await this.customerService.deleteCustomer(parseInt(id));
+    try {
+      return await this.customerService.deleteCustomer(parseInt(id));
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
   @Get(':id')
-  //only for admins
+  //TODO: only for admins
   async getOffice(@Param('id') id: string): Promise<Customer> {
-    return await this.customerService.findOne(parseInt(id));
+    try {
+      return await this.customerService.findById(parseInt(id));
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
+  //Post used for safety reasons
   @Post('/egn')
-  //only for admins
-  async findByEgn(@Body() body: { egn: string }) {
-    const user = await this.customerService.findByEgn(body.egn);
-    if (!user) {
-      throw new NotFoundException('user not found');
+  //TODO: only for admins
+  async findByEgn(@Body() body: UpdateCustomerDto): Promise<Customer> {
+    const { egn } = body;
+    try {
+      if (egn) {
+        const customer = await this.customerService.findByEgn(egn);
+        return customer;
+      }
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
     }
-    return user;
   }
 
   @Get('/egn/:id')
-  //only for admins
+  //TODO: only for admins
   async getEgn(@Param('id') id: string): Promise<string> {
-    return await this.customerService.getEgnOfCustomer(parseInt(id));
+    try {
+      return await this.customerService.getEgnOfCustomer(parseInt(id));
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 }

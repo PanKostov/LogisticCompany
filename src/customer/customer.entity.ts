@@ -14,10 +14,10 @@ export class Customer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: '80' })
   firstName: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: '80' })
   lastName: string;
 
   @Column({ unique: true, type: 'varchar' })
@@ -27,7 +27,7 @@ export class Customer {
   sentPackets: Packet[];
 
   @OneToMany(() => Packet, (packet) => packet.receiver)
-  recievedPackets: Packet[];
+  receivedPackets: Packet[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -40,8 +40,8 @@ export class Customer {
     return this;
   }
 
-  async decryptFields(dectyptor: Encryptor): Promise<Customer> {
-    this.egn = await dectyptor.decryptText(this.egn);
+  async decryptFields(decryptor: Encryptor): Promise<Customer> {
+    this.egn = await decryptor.decryptText(this.egn);
     return this;
   }
 }

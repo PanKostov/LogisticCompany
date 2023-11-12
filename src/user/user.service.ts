@@ -14,6 +14,7 @@ export class UserService {
     private customerService: CustomerService,
     private encryptor: Encryptor,
   ) {
+    //TODO: The password should be store in ouside cloud or in .env
     this.encryptor = new Encryptor('Password used to generate key');
   }
 

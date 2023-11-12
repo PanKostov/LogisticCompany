@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Customer } from './customer.entity';
-import { CustomerInterface } from './dtos/customer.interface';
+import { CustomerDto } from './dtos/customer.dto';
 import { Packet } from '../packet/packet.entity';
 import { Encryptor } from '../other/encryptor';
 
@@ -10,23 +10,20 @@ import { Encryptor } from '../other/encryptor';
 export class CustomerService {
   constructor(
     @InjectRepository(Customer) private repo: Repository<Customer>,
-    private encryptor: Encryptor,
+    private readonly encryptor: Encryptor,
   ) {
+    //TODO: The password should be store in ouside cloud or in .env
     this.encryptor = new Encryptor('Password used to generate key');
   }
 
-  async createCustomer(
-    customerInterface: CustomerInterface,
-  ): Promise<Customer> {
-    customerInterface.egn = await this.encryptor.encryptText(
-      customerInterface.egn,
-    );
-    const customer = this.repo.create(customerInterface);
+  async createCustomer(customer: CustomerDto): Promise<Customer> {
+    customer.egn = await this.encryptor.encryptText(customer.egn);
+    const createdCustomer = this.repo.create(customer);
 
-    customer.sentPackets = new Array<Packet>();
-    customer.recievedPackets = new Array<Packet>();
+    createdCustomer.sentPackets = new Array<Packet>();
+    createdCustomer.receivedPackets = new Array<Packet>();
 
-    return this.repo.save(customer);
+    return this.repo.save(createdCustomer);
   }
 
   async updateCustomer(
@@ -47,7 +44,7 @@ export class CustomerService {
     return updatedEntity.raw[0];
   }
 
-  async findOne(id: number): Promise<Customer> {
+  async findById(id: number): Promise<Customer> {
     const customer = await this.repo.findOneBy({ id });
     if (!customer) {
       throw new NotFoundException(`Customer with id: ${id} does not exist!`);
@@ -56,27 +53,35 @@ export class CustomerService {
   }
 
   async deleteCustomer(id: number): Promise<Customer> {
-    const customer = await this.findOne(id);
+    const customer = await this.findById(id);
+    if (!customer) {
+      throw new NotFoundException(`Customer with id: ${id} does not exist!`);
+    }
     return await this.repo.remove(customer);
   }
 
-  async findByEgn(egn: string): Promise<Customer | undefined> {
+  async findByEgn(egn: string): Promise<Customer> {
     const encryptedEgn = await this.encryptor.encryptText(egn);
+
     const customer = await this.repo.findOneBy({ egn: encryptedEgn });
+    if (!customer) {
+      throw new NotFoundException(`Customer with egn: ${egn} does not exist!`);
+    }
+
     return customer?.decryptFields(this.encryptor);
   }
 
   async getEgnOfCustomer(id: number): Promise<string> {
-    const customer = await this.findOne(id);
+    const customer = await this.findById(id);
     return customer.egn;
   }
 
   async getSentPackets(id: number): Promise<Packet[]> {
-    return (await this.findOne(id)).sentPackets;
+    return (await this.findById(id)).sentPackets;
   }
 
   async getReceivedPackets(id: number): Promise<Packet[]> {
-    return (await this.findOne(id)).recievedPackets;
+    return (await this.findById(id)).receivedPackets;
   }
 
   async getAllCustomers(): Promise<Customer[]> {
