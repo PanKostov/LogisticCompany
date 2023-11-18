@@ -30,7 +30,7 @@ export class AuthenticationController {
       body.egn,
     );
 
-    session.userId = user.id;
+    session.user = user;
 
     return user;
   }
@@ -39,13 +39,13 @@ export class AuthenticationController {
   @Throttle(3, 60)
   async signIn(@Body() body: UserDto, @Session() session: any): Promise<User> {
     const user = await this.authService.signIn(body.email, body.password);
-    session.userId = user.id;
+    session.user = user;
     return user;
   }
 
   @Post('/signout')
   signOut(@Session() session: any) {
-    session.userId = null;
+    session.user = null;
   }
 
   @Patch('/change-password')
@@ -53,27 +53,27 @@ export class AuthenticationController {
   @Throttle(3, 60)
   async updateUserPassword(
     @Body() body: { oldPassword: string; newPassword: string },
-    @Session() session: { userId: number },
+    @Session() session: { user: User },
   ): Promise<User> {
     console.log(session);
     return await this.authService.updatePassword(
-      session.userId,
+      session.user.id,
       body.oldPassword,
       body.newPassword,
     );
   }
 
-  //forgot-password - to setup new method
-  @Patch('/forgotten-password/user/:id')
-  @Throttle(3, 60)
-  async newUserPassword(
-    @Param('id') id: string,
-    @Body() body: { oldPassword: string; newPassword: string },
-  ): Promise<User> {
-    return await this.authService.updatePassword(
-      parseInt(id),
-      body.oldPassword,
-      body.newPassword,
-    );
-  }
+  //TODO: forgot-password - to setup new method - need an email service for that
+  // @Patch('/forgotten-password/user/:id')
+  // @Throttle(3, 60)
+  // async newUserPassword(
+  //   @Param('id') id: string,
+  //   @Body() body: { oldPassword: string; newPassword: string },
+  // ): Promise<User> {
+  //   return await this.authService.updatePassword(
+  //     parseInt(id),
+  //     body.oldPassword,
+  //     body.newPassword,
+  //   );
+  // }
 }

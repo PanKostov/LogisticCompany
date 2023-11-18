@@ -28,7 +28,7 @@ export class Packet {
   })
   sender: Customer;
 
-  @ManyToOne(() => Customer, (customer) => customer.recievedPackets, {
+  @ManyToOne(() => Customer, (customer) => customer.receivedPackets, {
     eager: true,
   })
   receiver: Customer;

@@ -86,8 +86,8 @@ export class PacketService {
     senderId: number,
     recieverId: number,
   ): Promise<{ sender: Customer; receiver: Customer }> {
-    const sender = await this.customerService.findOne(senderId);
-    const receiver = await this.customerService.findOne(recieverId);
+    const sender = await this.customerService.findById(senderId);
+    const receiver = await this.customerService.findById(recieverId);
     return { sender, receiver };
   }
 

@@ -6,6 +6,7 @@ import { Encryptor } from '../other/encryptor';
 import { Packet } from '../packet/packet.entity';
 import { CustomerService } from '../customer/customer.service';
 import { Customer } from '../customer/customer.entity';
+import { UserAccess } from './user.access.enum';
 
 @Injectable()
 export class UserService {
@@ -14,6 +15,7 @@ export class UserService {
     private customerService: CustomerService,
     private encryptor: Encryptor,
   ) {
+    //TODO: The password should be store in ouside cloud or in .env
     this.encryptor = new Encryptor('Password used to generate key');
   }
 
@@ -29,6 +31,7 @@ export class UserService {
       password,
       egn: egnEncrypted,
       isEmployee,
+      type: UserAccess.REGULAR,
     });
 
     return await this.repo.save(user);
@@ -45,6 +48,8 @@ export class UserService {
       .set({
         ...(attrs.email && { email: attrs.email }),
         ...(attrs.userName && { userName: attrs.userName }),
+        ...(attrs.isEmployee && { isEmployee: attrs.isEmployee }),
+        ...(attrs.type && { type: attrs.type }),
       })
       .where({ id })
       .returning('*')
@@ -137,7 +142,7 @@ export class UserService {
 
   async sentPacketsForUser(id: number): Promise<Packet[]> {
     const customer = await this.findCustomerWithSameEgn(id);
-
+    console.log(customer);
     return await this.customerService.getSentPackets(customer.id);
   }
 
@@ -146,6 +151,4 @@ export class UserService {
 
     return await this.customerService.getReceivedPackets(customer.id);
   }
-
-  //new method - to give(admin) rights to a user
 }
