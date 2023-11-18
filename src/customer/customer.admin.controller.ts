@@ -3,6 +3,6 @@ import { CustomerService } from './customer.service';
 
 //ONLY FOR ADMINS
 @Controller('admin/customer')
-export class AdminCustomerController {
+export class CustomerAdminController {
   constructor(private readonly customerService: CustomerService) {}
 }
