@@ -9,9 +9,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { OfficeService } from './office.service';
-import { EmployeeType } from 'src/employee/employee.type';
+import { EmployeeType } from '../employee/employee.type';
 import { Office } from './office.entity';
 import { Employee } from '../employee/employee.entity';
+import { EmployeeDto } from '../employee/dtos/employee.dto';
 
 @Controller('office')
 export class OfficeController {
@@ -61,18 +62,14 @@ export class OfficeController {
   }
 
   //For admins only
-  @Post('/employee')
+  @Post('/employee-for-office/:officeId')
   async addEmployee(
+    @Param('officeId') officeId: string,
     @Body()
-    body: {
-      officeId: number;
-      firstName: string;
-      lastName: string;
-      type: EmployeeType;
-    },
+    body: EmployeeDto,
   ): Promise<Employee> {
     return await this.officeService.addEmployee(
-      body.officeId,
+      parseInt(officeId),
       body.firstName,
       body.lastName,
       body.type,
@@ -80,7 +77,7 @@ export class OfficeController {
   }
 
   //For admins only
-  @Patch('/employee')
+  @Patch('/employee-for-office/:officeId')
   async updateEmployee(
     @Body()
     body: {
@@ -100,7 +97,7 @@ export class OfficeController {
     );
   }
 
-  @Get('/employee/:officeId')
+  @Get('/employees/:officeId')
   async getOfficeEmployees(
     @Param('officeId') officeId: string,
   ): Promise<Employee[]> {
@@ -108,15 +105,15 @@ export class OfficeController {
   }
 
   //For admins only
-  @Delete('/employee/:officeId/:employeeId')
-  async deleteOfficeEmployee(
-    @Param('officeId') officeId: string,
-    @Param('employeeId') employeeId: string,
-  ): Promise<Employee> {
-    return await this.officeService.deleteOfficeEmployee(
-      parseInt(officeId),
-      parseInt(employeeId),
-    );
+  @Delete('/employee')
+  async deleteOfficeEmployee({
+    officeId,
+    employeeId,
+  }: {
+    officeId: number;
+    employeeId: number;
+  }): Promise<Employee> {
+    return await this.officeService.deleteOfficeEmployee(officeId, employeeId);
   }
 
   //For admins only

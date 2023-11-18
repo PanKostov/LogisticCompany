@@ -3,7 +3,7 @@ import { PacketService } from './packet.service';
 import { SendPackageInterface } from './dtos/send.package.interface';
 import { Packet } from './packet.entity';
 
-//TO DO: add Auth Guard - to be used only from users who are employees
+//TODO: add Auth Guard - to be used only from users who are employees
 
 @Controller('packet')
 export class PacketController {

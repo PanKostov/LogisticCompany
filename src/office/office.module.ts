@@ -4,10 +4,11 @@ import { Office } from './office.entity';
 import { OfficeService } from './office.service';
 import { OfficeController } from './office.controller';
 import { EmployeeModule } from '../employee/employee.module';
+import { AdminOfficeController } from './office.admin.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Office]), EmployeeModule],
-  controllers: [OfficeController],
+  controllers: [OfficeController, AdminOfficeController],
   providers: [OfficeService],
   exports: [OfficeService],
 })

@@ -47,9 +47,15 @@ export class CustomerController {
     }
   }
 
+  @Get()
+  //TODO: only for admins
+  async getAllCustomers(): Promise<Customer[]> {
+    return await this.customerService.getAllCustomers();
+  }
+
   @Get(':id')
   //TODO: only for admins
-  async getOffice(@Param('id') id: string): Promise<Customer> {
+  async getCustomer(@Param('id') id: string): Promise<Customer> {
     try {
       return await this.customerService.findById(parseInt(id));
     } catch (error) {
@@ -60,8 +66,7 @@ export class CustomerController {
   //Post used for safety reasons
   @Post('/egn')
   //TODO: only for admins
-  async findByEgn(@Body() body: UpdateCustomerDto): Promise<Customer> {
-    const { egn } = body;
+  async findByEgn(@Body() { egn }: UpdateCustomerDto): Promise<Customer> {
     try {
       if (egn) {
         const customer = await this.customerService.findByEgn(egn);
@@ -74,7 +79,7 @@ export class CustomerController {
 
   @Get('/egn/:id')
   //TODO: only for admins
-  async getEgn(@Param('id') id: string): Promise<string> {
+  async getEgnOfCustomer(@Param('id') id: string): Promise<string> {
     try {
       return await this.customerService.getEgnOfCustomer(parseInt(id));
     } catch (error) {

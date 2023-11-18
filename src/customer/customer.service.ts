@@ -76,12 +76,23 @@ export class CustomerService {
     return customer.egn;
   }
 
+  //TODO: - these 3 methods to be tested(used in the user service)
   async getSentPackets(id: number): Promise<Packet[]> {
-    return (await this.findById(id)).sentPackets;
+    const customer = await this.repo.findOne({
+      where: { id },
+      relations: ['sentPackets'],
+    });
+
+    return customer.sentPackets;
   }
 
   async getReceivedPackets(id: number): Promise<Packet[]> {
-    return (await this.findById(id)).receivedPackets;
+    const customer = await this.repo.findOne({
+      where: { id },
+      relations: ['receivedPackets'],
+    });
+
+    return customer.receivedPackets;
   }
 
   async getAllCustomers(): Promise<Customer[]> {

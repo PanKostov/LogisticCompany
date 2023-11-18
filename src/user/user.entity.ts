@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserAccess } from './user.access';
+import { UserAccess } from './user.access.enum';
 
 @Entity()
 export class User {
