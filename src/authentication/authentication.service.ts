@@ -53,7 +53,7 @@ export class AuthenticationService {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      throw new HttpException('Old password does not mach!', 400);
+      throw new HttpException('Old password does not match!', 400);
     }
 
     if (oldPassword === newPassword) {
