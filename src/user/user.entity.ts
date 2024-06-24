@@ -1,4 +1,4 @@
-import { Encryptor } from '../other/encryptor';
+import { EncryptionService } from '../encryption-service/encryption.service';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -52,13 +52,13 @@ export class User {
     this.isEmployee = source.isEmployee ?? this.isEmployee;
   }
 
-  async encryptFields(encryptor: Encryptor): Promise<User> {
-    this.egn = await encryptor.encryptText(this.egn);
+  async encryptFields(encryptionService: EncryptionService): Promise<User> {
+    this.egn = encryptionService.encrypt(this.egn);
     return this;
   }
 
-  async decryptFields(dectyptor: Encryptor): Promise<User> {
-    this.egn = await dectyptor.decryptText(this.egn);
+  async decryptFields(encryptionService: EncryptionService): Promise<User> {
+    this.egn = encryptionService.decrypt(this.egn);
     return this;
   }
 }

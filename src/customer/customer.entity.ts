@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Encryptor } from '../other/encryptor';
+import { EncryptionService } from '../encryption-service/encryption.service';
 import { Packet } from '../packet/packet.entity';
 
 @Entity()
@@ -35,13 +35,13 @@ export class Customer {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  async encryptFields(encryptor: Encryptor): Promise<Customer> {
-    this.egn = await encryptor.encryptText(this.egn);
+  async encryptFields(encryptionService: EncryptionService): Promise<Customer> {
+    this.egn = encryptionService.encrypt(this.egn);
     return this;
   }
 
-  async decryptFields(decryptor: Encryptor): Promise<Customer> {
-    this.egn = await decryptor.decryptText(this.egn);
+  async decryptFields(encryptionService: EncryptionService): Promise<Customer> {
+    this.egn = encryptionService.encrypt(this.egn);
     return this;
   }
 }

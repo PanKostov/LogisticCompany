@@ -13,7 +13,7 @@ import { Employee } from '../employee/employee.entity';
 import { EmployeeDto } from '../employee/dtos/employee.dto';
 import { EmployeeType } from '../employee/employee.type';
 import { Office } from './office.entity';
-import { AdminGuard } from '../guards/admin.guard';
+import { AdminGuard } from '../guards/AdminGuard';
 import { Throttle } from '@nestjs/throttler';
 
 @Controller('admin/office')
@@ -21,7 +21,6 @@ export class OfficeAdminController {
   constructor(private readonly officeService: OfficeService) {}
 
   @Post('/creation')
-  @Throttle(5, 60)
   @UseGuards(AdminGuard)
   createOffice(
     @Body()
@@ -39,7 +38,6 @@ export class OfficeAdminController {
   }
 
   @Patch('/update/:id')
-  @Throttle(5, 60)
   @UseGuards(AdminGuard)
   async updateOffice(
     @Param('id') id: string,
@@ -50,14 +48,12 @@ export class OfficeAdminController {
   }
 
   @Delete(':id')
-  @Throttle(3, 60)
   @UseGuards(AdminGuard)
   async deleteOffice(@Param('id') id: string): Promise<Office> {
     return await this.officeService.deleteOffice(parseInt(id));
   }
 
   @Get('/employees/:officeId')
-  @Throttle(10, 60)
   @UseGuards(AdminGuard)
   async getOfficeEmployees(
     @Param('officeId') officeId: string,
@@ -66,14 +62,12 @@ export class OfficeAdminController {
   }
 
   @Get(':id')
-  @Throttle(10, 60)
   @UseGuards(AdminGuard)
   async getOffice(@Param('id') id: string): Promise<Office> {
     return await this.officeService.getOfficeById(parseInt(id));
   }
 
   @Post('/employee-for-office/:officeId')
-  @Throttle(5, 60)
   @UseGuards(AdminGuard)
   async addEmployee(
     @Param('officeId') officeId: string,
@@ -89,7 +83,6 @@ export class OfficeAdminController {
   }
 
   @Patch('/employee-for-office/:officeId')
-  @Throttle(5, 60)
   @UseGuards(AdminGuard)
   async updateEmployee(
     @Body()
@@ -111,7 +104,6 @@ export class OfficeAdminController {
   }
 
   @Delete('/employee')
-  @Throttle(5, 60)
   @UseGuards(AdminGuard)
   async deleteOfficeEmployee({
     officeId,
@@ -124,7 +116,6 @@ export class OfficeAdminController {
   }
 
   @Delete('/employees')
-  @Throttle(1, 60)
   @UseGuards(AdminGuard)
   async deleteAllEmployeesFromOffice(
     @Param('officeId') officeId: string,

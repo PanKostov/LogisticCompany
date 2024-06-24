@@ -8,9 +8,11 @@ import { Customer } from './customer/customer.entity';
 import { Packet } from './packet/packet.entity';
 import { OfficeModule } from './office/office.module';
 import { EmployeeModule } from './employee/employee.module';
-import { AuthenticationModule } from './authentication/authentication.module';
+import { AuthenticationModule } from './authentication/AuthenticationModule';
 import { PacketModule } from './packet/packet.module';
 import { CustomerModule } from './customer/customer.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ONE_MINUTE_TTL } from './utils/RateLimitting';
 
 @Module({
   imports: [
@@ -25,6 +27,12 @@ import { CustomerModule } from './customer/customer.module';
       synchronize: true,
     }),
     TypeOrmModule.forFeature([User, Office, Employee, Customer, Packet]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: ONE_MINUTE_TTL,
+        limit: 10,
+      },
+    ]),
     UserModule,
     OfficeModule,
     EmployeeModule,

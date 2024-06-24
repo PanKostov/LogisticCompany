@@ -2,7 +2,6 @@ import { createCipheriv, scrypt, createDecipheriv } from 'crypto';
 import { promisify } from 'util';
 import { randomBytes } from 'crypto';
 
-
 //Usually should be stored outside the code(for example in AWS)
 const RANDOM_BYTES = [
   0x43, 0x02, 0xbb, 0xc1, 0xac, 0xf7, 0xb5, 0x8f, 0x8c, 0x83, 0x55, 0x5a, 0x98,

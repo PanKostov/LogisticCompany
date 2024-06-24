@@ -4,20 +4,22 @@ import { Repository } from 'typeorm';
 import { Customer } from './customer.entity';
 import { CustomerDto } from './dtos/customer.dto';
 import { Packet } from '../packet/packet.entity';
-import { Encryptor } from '../other/encryptor';
+import { EncryptionService } from '../encryption-service/encryption.service';
 
 @Injectable()
 export class CustomerService {
   constructor(
     @InjectRepository(Customer) private repo: Repository<Customer>,
-    private readonly encryptor: Encryptor,
+    private readonly encryptionService: EncryptionService,
   ) {
     //TODO: The password should be store in ouside cloud or in .env
-    this.encryptor = new Encryptor('Password used to generate key');
+    this.encryptionService = new EncryptionService(
+      'Password used to generate key',
+    );
   }
 
   async createCustomer(customer: CustomerDto): Promise<Customer> {
-    customer.egn = await this.encryptor.encryptText(customer.egn);
+    customer.egn = this.encryptionService.encrypt(customer.egn);
     const createdCustomer = this.repo.create(customer);
 
     createdCustomer.sentPackets = new Array<Packet>();
@@ -49,7 +51,7 @@ export class CustomerService {
     if (!customer) {
       throw new NotFoundException(`Customer with id: ${id} does not exist!`);
     }
-    return customer.decryptFields(this.encryptor);
+    return customer.decryptFields(this.encryptionService);
   }
 
   async deleteCustomer(id: number): Promise<Customer> {
@@ -61,14 +63,14 @@ export class CustomerService {
   }
 
   async findByEgn(egn: string): Promise<Customer> {
-    const encryptedEgn = await this.encryptor.encryptText(egn);
+    const encryptedEgn = this.encryptionService.encrypt(egn);
 
     const customer = await this.repo.findOneBy({ egn: encryptedEgn });
     if (!customer) {
       throw new NotFoundException(`Customer with egn: ${egn} does not exist!`);
     }
 
-    return customer?.decryptFields(this.encryptor);
+    return customer?.decryptFields(this.encryptionService);
   }
 
   async getEgnOfCustomer(id: number): Promise<string> {

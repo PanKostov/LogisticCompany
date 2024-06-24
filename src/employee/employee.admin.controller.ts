@@ -3,14 +3,13 @@ import { Throttle } from '@nestjs/throttler';
 import { EmployeeService } from './employee.service';
 import { Employee } from './employee.entity';
 import { EmployeeDto } from './dtos/employee.dto';
-import { AdminGuard } from '../guards/admin.guard';
+import { AdminGuard } from '../guards/AdminGuard';
 
 @Controller('admin/employee')
 export class EmployeeAdminController {
   constructor(private readonly employeeService: EmployeeService) {}
 
   @Post()
-  @Throttle(5, 60)
   @UseGuards(AdminGuard)
   createEmployee(@Body() body: EmployeeDto): Promise<Employee> {
     return this.employeeService.createEmployee(
@@ -21,7 +20,6 @@ export class EmployeeAdminController {
   }
 
   @Get()
-  @Throttle(10, 60)
   @UseGuards(AdminGuard)
   async getAllEmployees() {
     return await this.employeeService.getAllEmployees();
