@@ -1,6 +1,7 @@
-import { IsStrongPassword, MaxLength } from 'class-validator'
+import { IsNotEmpty, IsStrongPassword, MaxLength } from 'class-validator'
 
 export class ChangePasswordRequestDto {
+  @IsNotEmpty()
   oldPassword: string
 
   @MaxLength(50)
