@@ -4,10 +4,11 @@ import { AuthenticationController } from './AuthenticationController'
 import { AuthenticationService } from './AuthenticationService'
 import { EncryptionService } from '../encryption-service/EncryptionService'
 import { EmailService } from '../email/EmailService'
+import { EmailModule } from '../email/EmailModule'
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, EmailModule],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService, EncryptionService, EmailService],
+  providers: [AuthenticationService, EncryptionService],
 })
 export class AuthenticationModule {}

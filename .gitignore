@@ -37,3 +37,6 @@ lerna-debug.log*
 # ENV
 # TODO: uncomment later
 # .env
+
+# Data
+/data

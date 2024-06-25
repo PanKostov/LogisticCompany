@@ -12,7 +12,7 @@ export class EmailService {
     await this.mailerService.sendMail({
       to: user.email,
       from: '"Support Team" <support@example.com>', // override default from
-      subject: 'Welcome to Nice App! Confirm your Email',
+      subject: 'Welcome to Logistic Company! Confirm your Email',
       template: './welcome', // `.ejs` extension is appended automatically
       context: {
         // filling <%= %> brackets with content

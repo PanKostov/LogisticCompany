@@ -4,10 +4,11 @@ import { UserService } from '../user/UserService'
 import { UserMapper } from '../user/mapper/UserMapper'
 import { UserResponseDto } from '../user/dtos/UserResponseDto.dto'
 import { ValidationError } from '../utils/errors/ValidationError'
+import { EmailService } from '../email/EmailService'
 
 @Injectable()
 export class AuthenticationService {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private emailService: EmailService) {}
 
   async signUp(email: string, password: string, egn: string): Promise<UserResponseDto> {
     try {
@@ -22,6 +23,7 @@ export class AuthenticationService {
       }
 
       const userResponse = await this.userService.createUser(email, passwordHashed, egn, false)
+      await this.emailService.sendUserWelcome(user, 'testToken')
 
       return UserMapper.toDto(userResponse)
     } catch (error) {

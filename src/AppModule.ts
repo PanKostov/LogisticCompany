@@ -25,9 +25,9 @@ import { ConfigModule } from '@nestjs/config'
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
-      port: 5432,
+      port: 4466,
       username: 'postgres',
-      password: 'password',
+      password: 'postgres',
       database: 'postgres',
       entities: [User, Office, Employee, Customer, Packet],
       synchronize: true,
