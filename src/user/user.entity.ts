@@ -1,64 +1,58 @@
-import { EncryptionService } from '../encryption-service/encryption.service';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { UserAccess } from './user.access.enum';
+import { EncryptionService } from '../encryption-service/EncryptionService'
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { UserAccess } from './models/UserAccess.enum'
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ unique: true, type: 'varchar' })
-  email: string;
+  email: string
 
   @Column({ nullable: true, type: 'varchar' })
-  userName: string;
+  userName: string
 
   @Column({ type: 'varchar' })
-  password: string;
+  password: string
 
   @Column({ unique: true, type: 'varchar' })
-  egn: string;
+  egn: string
 
   @Column({ type: 'boolean' })
-  isEmployee: boolean;
+  isEmployee: boolean
 
   @Column({ enum: UserAccess, type: 'enum' })
-  type: UserAccess;
+  type: UserAccess
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updatedAt: Date
 
   static from(source: Partial<User>): User {
-    const entityModel = new User();
-    entityModel.updateFields(source);
+    const entityModel = new User()
+    entityModel.updateFields(source)
 
-    return entityModel;
+    return entityModel
   }
 
   updateFields(source: Partial<User>) {
-    this.email = source.email ?? this.email;
-    this.userName = source.userName ?? this.userName;
-    this.password = source.password ?? this.password;
-    this.egn = source.egn ?? this.egn;
-    this.isEmployee = source.isEmployee ?? this.isEmployee;
+    this.email = source.email ?? this.email
+    this.userName = source.userName ?? this.userName
+    this.password = source.password ?? this.password
+    this.egn = source.egn ?? this.egn
+    this.isEmployee = source.isEmployee ?? this.isEmployee
   }
 
   async encryptFields(encryptionService: EncryptionService): Promise<User> {
-    this.egn = encryptionService.encrypt(this.egn);
-    return this;
+    this.egn = encryptionService.encrypt(this.egn)
+    return this
   }
 
   async decryptFields(encryptionService: EncryptionService): Promise<User> {
-    this.egn = encryptionService.decrypt(this.egn);
-    return this;
+    this.egn = encryptionService.decrypt(this.egn)
+    return this
   }
 }

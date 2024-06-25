@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import { UserService } from '../user/user.service'
-import { UserMapper } from '../user/mapper/user.mapper'
-import { UserResponseDto } from '../user/dtos/user.response.dto'
+import { UserService } from '../user/UserService'
+import { UserMapper } from '../user/mapper/UserMapper'
+import { UserResponseDto } from '../user/dtos/UserResponseDto.dto'
 import { ValidationError } from '../utils/errors/ValidationError'
 
 @Injectable()

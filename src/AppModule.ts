@@ -1,21 +1,27 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/user.entity';
-import { UserModule } from './user/user.module';
-import { Employee } from './employee/employee.entity';
-import { Office } from './office/office.entity';
-import { Customer } from './customer/customer.entity';
-import { Packet } from './packet/packet.entity';
-import { OfficeModule } from './office/office.module';
-import { EmployeeModule } from './employee/employee.module';
-import { AuthenticationModule } from './authentication/AuthenticationModule';
-import { PacketModule } from './packet/packet.module';
-import { CustomerModule } from './customer/customer.module';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { ONE_MINUTE_TTL } from './utils/RateLimitting';
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { User } from './user/User.entity'
+import { UserModule } from './user/UserModule'
+import { Employee } from './employee/employee.entity'
+import { Office } from './office/Office.entity'
+import { Customer } from './customer/Customer.entity'
+import { Packet } from './packet/PacketEntity'
+import { OfficeModule } from './office/OfficeModule'
+import { EmployeeModule } from './employee/EmployeeModule'
+import { AuthenticationModule } from './authentication/AuthenticationModule'
+import { PacketModule } from './packet/PacketModule'
+import { CustomerModule } from './customer/CustomerModule'
+import { ThrottlerModule } from '@nestjs/throttler'
+import { ONE_MINUTE_TTL } from './utils/RateLimitting'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
   imports: [
+    //Allow the application to load variables from .env files
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true, // no need to import into other modules
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

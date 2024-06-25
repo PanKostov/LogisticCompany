@@ -1,51 +1,42 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-  OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Employee } from '../employee/employee.entity';
-import { Packet } from '../packet/packet.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { Employee } from '../employee/employee.entity'
+import { Packet } from '../packet/PacketEntity'
 
 @Entity()
 export class Office {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ type: 'varchar' })
-  city: string;
+  city: string
 
   @Column({ type: 'varchar' })
-  street: string;
+  street: string
 
   @Column({ type: 'int4' })
-  streetNumber: number;
+  streetNumber: number
 
   @ManyToMany(() => Employee)
   @JoinTable({ name: 'office_employees' })
-  employees: Employee[];
+  employees: Employee[]
 
   @OneToMany(() => Packet, (packet) => packet.fromOffice)
-  sentPackets: Packet[];
+  sentPackets: Packet[]
 
   @OneToMany(() => Packet, (packet) => packet.toOffice)
-  recievedPackets: Packet[];
+  recievedPackets: Packet[]
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updatedAt: Date
 
   async addEmployee(employee: Employee): Promise<Employee> {
     if (!this.employees) {
-      this.employees = new Array<Employee>();
+      this.employees = new Array<Employee>()
     }
-    this.employees.push(employee);
-    return employee;
+    this.employees.push(employee)
+    return employee
   }
 }

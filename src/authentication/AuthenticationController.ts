@@ -1,13 +1,13 @@
 import { Controller, Post, Body, Patch, Session, UseGuards, SetMetadata } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
 import { AuthenticationService } from './AuthenticationService'
-import { User } from '../user/user.entity'
+import { User } from '../user/User.entity'
 import { AuthGuard } from '../guards/AuthGuard'
-import { UserResponseDto } from '../user/dtos/user.response.dto'
+import { UserResponseDto } from '../user/dtos/UserResponseDto.dto'
 import { FIVE_MINUTES_TTL, ONE_MINUTE_TTL } from '../utils/RateLimitting'
 import { ChangePasswordRequestDto } from './dtos/ChangePasswordRequestDto.dto'
-import { CreateUserDto } from '../user/dtos/create-user.dto'
-import { UserDto } from '../user/dtos/user.dto'
+import { CreateUserDto } from '../user/dtos/CreateUserDto.dto'
+import { UserDto } from '../user/dtos/UserDto.dto'
 
 export const Public = () => SetMetadata('isPublic', true)
 @Controller('authentication')
