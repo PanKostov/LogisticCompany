@@ -11,9 +11,9 @@ export class EmailService {
 
     await this.mailerService.sendMail({
       to: user.email,
-      from: '"Support Team" <support@example.com>', // override default from
+      from: '"Support Team" <mailtrap@demomailtrap.com>', // override default from
       subject: 'Welcome to Logistic Company! Confirm your Email',
-      template: './welcome', // `.ejs` extension is appended automatically
+      template: '../../email-templates/welcome', // `.ejs` extension is appended automatically
       context: {
         // filling <%= %> brackets with content
         name: user.userName,

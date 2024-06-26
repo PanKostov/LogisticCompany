@@ -7,7 +7,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   app.use(
     session({
-      //TODO: - this usually should not be here
       secret: process.env.SECRET,
       resave: false,
       saveUninitialized: false,

@@ -1,84 +1,61 @@
-import crypto from 'crypto';
-import { EncryptionParams } from './models/EncryptionParams';
+import { createCipheriv, createDecipheriv, scrypt, randomBytes } from 'crypto'
+import { promisify } from 'util'
+import { EncryptionParams } from './models/EncryptionParams'
 
 export class EncryptionService {
   constructor(private passwordKey: string) {}
 
-  encrypt(value: string): string {
-    const key = Buffer.from(this.passwordKey.substring(32), 'hex');
-    const iv = Buffer.from(this.passwordKey.substring(0, 32), 'hex');
+  async encrypt(value: string): Promise<string> {
+    const key = await this.generateKey()
+    const iv = randomBytes(16) // CBC mode requires a 16-byte IV
 
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(value, 'utf16le' as any, 'base64' as any);
-    encrypted += cipher.final('base64');
+    const cipher = createCipheriv('aes-256-cbc', key, iv)
+    const valueEncrypted = Buffer.concat([cipher.update(value, 'utf8'), cipher.final()])
 
-    return encrypted;
+    // Store the IV along with the encrypted value
+    return `${iv.toString('hex')}:${valueEncrypted.toString('base64')}`
   }
 
-  decrypt(value: string): string {
-    const key = Buffer.from(this.passwordKey.substring(32), 'hex');
-    const iv = Buffer.from(this.passwordKey.substring(0, 32), 'hex');
+  async decrypt(encryptedValue: string): Promise<string> {
+    const [ivHex, valueEncrypted] = encryptedValue.split(':')
+    const key = await this.generateKey()
+    const iv = Buffer.from(ivHex, 'hex')
 
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(value, 'base64' as any, 'utf16le' as any);
-    decrypted += decipher.final('utf16le');
+    const decipher = createDecipheriv('aes-256-cbc', key, iv)
+    const decryptedValue = Buffer.concat([decipher.update(Buffer.from(valueEncrypted, 'base64')), decipher.final()]).toString('utf8')
 
-    return decrypted;
+    return decryptedValue
   }
 
-  encryptPersonalized({
-    value,
-    inputCharEncoding,
-    outputCharEncoding,
-    cipherAlgorithm,
-    cipherKey,
-    binaryIv,
-  }: EncryptionParams): string {
-    const key = cipherKey ?? Buffer.from(this.passwordKey.substring(32), 'hex');
-    const iv =
-      binaryIv ?? Buffer.from(this.passwordKey.substring(0, 32), 'hex');
+  private async generateKey(): Promise<Buffer> {
+    return (await promisify(scrypt)(this.passwordKey, 'salt', 32)) as Buffer
+  }
 
-    const cipher = crypto.createCipheriv(cipherAlgorithm, key, iv);
+  encryptPersonalized(params: EncryptionParams): string {
+    const key = params.cipherKey ?? Buffer.from(this.passwordKey.substring(32), 'hex')
+    const iv = params.binaryIv ?? Buffer.from(this.passwordKey.substring(0, 32), 'hex')
 
-    const inputEncoding = inputCharEncoding;
-    const outputEncoding = outputCharEncoding;
-    let encrypted = cipher.update(
-      value,
-      inputEncoding as any,
-      outputEncoding as any,
-    );
-    encrypted += cipher.final(outputCharEncoding);
+    const cipher = createCipheriv(params.cipherAlgorithm, key, iv)
 
-    return encrypted;
+    const encrypted = Buffer.concat([cipher.update(params.value, params.inputCharEncoding), cipher.final()]).toString(params.outputCharEncoding)
+
+    return encrypted
   }
 
   /** To decrypt successfully
    *  your inputCharEncoding must equal the value of outputCharEncoding you provided in the encryption
    *  your outputCharEncoding must equal the value of inputCharEncoding you provided in the encryption
    */
-  decryptPersonalized({
-    value,
-    inputCharEncoding,
-    outputCharEncoding,
-    cipherAlgorithm,
-    cipherKey,
-    binaryIv,
-  }: EncryptionParams): string {
-    const key = cipherKey ?? Buffer.from(this.passwordKey.substring(32), 'hex');
-    const iv =
-      binaryIv ?? Buffer.from(this.passwordKey.substring(0, 32), 'hex');
+  decryptPersonalized(params: EncryptionParams): string {
+    const key = params.cipherKey ?? Buffer.from(this.passwordKey.substring(32), 'hex')
+    const iv = params.binaryIv ?? Buffer.from(this.passwordKey.substring(0, 32), 'hex')
 
-    const decipher = crypto.createDecipheriv(cipherAlgorithm, key, iv);
+    const decipher = createDecipheriv(params.cipherAlgorithm, key, iv)
 
-    const inputEncoding = inputCharEncoding;
-    const outputEncoding = outputCharEncoding;
-    let decrypted = decipher.update(
-      value,
-      inputEncoding as any,
-      outputEncoding as any,
-    );
-    decrypted += decipher.final(outputCharEncoding);
+    const decrypted = Buffer.concat([decipher.update(Buffer.from(params.value, params.inputCharEncoding)), decipher.final()]).toString(
+      params.outputCharEncoding,
+    )
 
-    return decrypted;
+    return decrypted
   }
 }

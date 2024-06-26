@@ -47,12 +47,12 @@ export class User {
   }
 
   async encryptFields(encryptionService: EncryptionService): Promise<User> {
-    this.egn = encryptionService.encrypt(this.egn)
+    this.egn = await encryptionService.encrypt(this.egn)
     return this
   }
 
   async decryptFields(encryptionService: EncryptionService): Promise<User> {
-    this.egn = encryptionService.decrypt(this.egn)
+    this.egn = await encryptionService.decrypt(this.egn)
     return this
   }
 }

@@ -23,7 +23,7 @@ export class AuthenticationService {
       }
 
       const userResponse = await this.userService.createUser(email, passwordHashed, egn, false)
-      await this.emailService.sendUserWelcome(user, 'testToken')
+      await this.emailService.sendUserWelcome(userResponse, 'testToken')
 
       return UserMapper.toDto(userResponse)
     } catch (error) {

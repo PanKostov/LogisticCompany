@@ -15,12 +15,11 @@ export class UserService {
     private customerService: CustomerService,
     private encryptionService: EncryptionService,
   ) {
-    //TODO: The password should be stored in AWS secret manager
-    this.encryptionService = new EncryptionService('Password used to generate key')
+    this.encryptionService = new EncryptionService(process.env.ENCRYPTION_KEY)
   }
 
   async createUser(email: string, password: string, egn: string, isEmployee: boolean): Promise<User> {
-    const egnEncrypted = this.encryptionService.encrypt(egn)
+    const egnEncrypted = await this.encryptionService.encrypt(egn)
     const user = this.repo.create({
       email,
       password,
@@ -105,7 +104,7 @@ export class UserService {
   }
 
   async findByEgn(egn: string): Promise<User | undefined> {
-    const encryptedEgn = this.encryptionService.encrypt(egn)
+    const encryptedEgn = await this.encryptionService.encrypt(egn)
     const user = await this.repo.findOneBy({ egn: encryptedEgn })
     return user?.decryptFields(this.encryptionService)
   }

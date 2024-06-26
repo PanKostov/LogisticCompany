@@ -29,12 +29,12 @@ export class Customer {
   updatedAt: Date
 
   async encryptFields(encryptionService: EncryptionService): Promise<Customer> {
-    this.egn = encryptionService.encrypt(this.egn)
+    this.egn = await encryptionService.encrypt(this.egn)
     return this
   }
 
   async decryptFields(encryptionService: EncryptionService): Promise<Customer> {
-    this.egn = encryptionService.encrypt(this.egn)
+    this.egn = await encryptionService.encrypt(this.egn)
     return this
   }
 }

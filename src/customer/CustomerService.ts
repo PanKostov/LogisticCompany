@@ -9,12 +9,11 @@ import { EncryptionService } from '../encryption-service/EncryptionService'
 @Injectable()
 export class CustomerService {
   constructor(@InjectRepository(Customer) private repo: Repository<Customer>, private readonly encryptionService: EncryptionService) {
-    //TODO: The password should be store in ouside cloud or in .env
-    this.encryptionService = new EncryptionService('Password used to generate key')
+    this.encryptionService = new EncryptionService(process.env.ENCRYPTION_KEY)
   }
 
   async createCustomer(customer: CustomerDto): Promise<Customer> {
-    customer.egn = this.encryptionService.encrypt(customer.egn)
+    customer.egn = await this.encryptionService.encrypt(customer.egn)
     const createdCustomer = this.repo.create(customer)
 
     createdCustomer.sentPackets = new Array<Packet>()
@@ -55,7 +54,7 @@ export class CustomerService {
   }
 
   async findByEgn(egn: string): Promise<Customer> {
-    const encryptedEgn = this.encryptionService.encrypt(egn)
+    const encryptedEgn = await this.encryptionService.encrypt(egn)
 
     const customer = await this.repo.findOneBy({ egn: encryptedEgn })
     if (!customer) {
