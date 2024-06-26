@@ -1,36 +1,28 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { EmployeeType } from './employee.type';
-import { Office } from '../office/office.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { EmployeeType } from './models/EmployeeType'
+import { Office } from '../office/Office.entity'
 
 @Entity()
 export class Employee {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ type: 'varchar' })
-  firstName: string;
+  firstName: string
 
   @Column({ type: 'varchar' })
-  lastName: string;
+  lastName: string
 
   @Column({ enum: EmployeeType, type: 'enum' })
-  type: EmployeeType;
+  type: EmployeeType
 
   @ManyToMany(() => Office, (office) => office.employees)
   @JoinTable({ name: 'office_employees' })
-  offices: Office[];
+  offices: Office[]
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updatedAt: Date
 }

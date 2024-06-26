@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  logistic-postgres:
+    image: postgres:11.10
+    container_name: logistic-company-postgress
+    volumes:
+      - ./data/postgres-logistic:/var/lib/postgresql/data
+    ports:
+      - '4466:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres

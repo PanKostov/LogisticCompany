@@ -1,47 +1,40 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Encryptor } from '../other/encryptor';
-import { Packet } from '../packet/packet.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { EncryptionService } from '../encryption-service/EncryptionService'
+import { Packet } from '../packet/PacketEntity'
 
 @Entity()
 export class Customer {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ type: 'varchar', length: '80' })
-  firstName: string;
+  firstName: string
 
   @Column({ type: 'varchar', length: '80' })
-  lastName: string;
+  lastName: string
 
   @Column({ unique: true, type: 'varchar' })
-  egn: string;
+  egn: string
 
   @OneToMany(() => Packet, (packet) => packet.sender)
-  sentPackets: Packet[];
+  sentPackets: Packet[]
 
   @OneToMany(() => Packet, (packet) => packet.receiver)
-  receivedPackets: Packet[];
+  receivedPackets: Packet[]
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updatedAt: Date
 
-  async encryptFields(encryptor: Encryptor): Promise<Customer> {
-    this.egn = await encryptor.encryptText(this.egn);
-    return this;
+  async encryptFields(encryptionService: EncryptionService): Promise<Customer> {
+    this.egn = await encryptionService.encrypt(this.egn)
+    return this
   }
 
-  async decryptFields(decryptor: Encryptor): Promise<Customer> {
-    this.egn = await decryptor.decryptText(this.egn);
-    return this;
+  async decryptFields(encryptionService: EncryptionService): Promise<Customer> {
+    this.egn = await encryptionService.encrypt(this.egn)
+    return this
   }
 }
