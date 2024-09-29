@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { EmployeeAdminController } from './EmployeeAdminController'
 import { EmployeeService } from './EmployeeService'
-import { Employee } from './employee.entity'
+import { Employee } from './Employee.entity'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Employee])],

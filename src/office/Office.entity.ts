@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm'
-import { Employee } from '../employee/employee.entity'
-import { Packet } from '../packet/PacketEntity'
+import { Employee } from '../employee/Employee.entity'
+import { Packet } from '../packet/Packet.entity'
 
 @Entity()
 export class Office {

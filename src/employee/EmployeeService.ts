@@ -1,4 +1,4 @@
-import { Employee } from './employee.entity'
+import { Employee } from './Employee.entity'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'

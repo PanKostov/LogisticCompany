@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm'
 import { EncryptionService } from '../encryption-service/EncryptionService'
-import { Packet } from '../packet/PacketEntity'
+import { Packet } from '../packet/Packet.entity'
 
 @Entity()
 export class Customer {

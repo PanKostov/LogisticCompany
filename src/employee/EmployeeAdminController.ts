@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
 import { EmployeeService } from './EmployeeService'
-import { Employee } from './employee.entity'
+import { Employee } from './Employee.entity'
 import { EmployeeDto } from './dtos/EmployeeDto.dto'
 import { AdminGuard } from '../guards/AdminGuard'
 

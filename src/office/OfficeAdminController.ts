@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Patch, Param, Delete, Get, UseGuards } from '@nestjs/common'
 import { OfficeService } from './OfficeService'
-import { Employee } from '../employee/employee.entity'
+import { Employee } from '../employee/Employee.entity'
 import { EmployeeDto } from '../employee/dtos/EmployeeDto.dto'
 import { EmployeeType } from '../employee/models/EmployeeType'
 import { Office } from './Office.entity'

@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Patch, Param, Get } from '@nestjs/common'
 import { PacketService } from './PacketService'
 import { SendPackageInterface } from './dtos/SendPackageInterface'
-import { Packet } from './PacketEntity'
+import { Packet } from './Packet.entity'
 
 //TODO: add Auth Guard - to be used only from users who are employees
 

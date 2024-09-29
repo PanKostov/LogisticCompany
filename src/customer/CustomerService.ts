@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Customer } from './Customer.entity'
 import { CustomerDto } from './dtos/CustomerDto.dto'
-import { Packet } from '../packet/PacketEntity'
+import { Packet } from '../packet/Packet.entity'
 import { EncryptionService } from '../encryption-service/EncryptionService'
 
 @Injectable()

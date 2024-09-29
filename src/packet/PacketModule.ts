@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Packet } from './PacketEntity'
+import { Packet } from './Packet.entity'
 import { PacketController } from './PacketController'
 import { PacketService } from './PacketService'
 import { CustomerModule } from '../customer/CustomerModule'

@@ -2,7 +2,7 @@ version: '3.3'
 services:
   logistic-postgres:
     image: postgres:11.10
-    container_name: logistic-company-postgress
+    container_name: logistic-company-postgres
     volumes:
       - ./data/postgres-logistic:/var/lib/postgresql/data
     ports:
@@ -10,4 +10,9 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=logistic_company
+  redis-acm:
+    image: redis
+    container_name: logistic-company-redis
+    ports:
+      - '7379:6379'

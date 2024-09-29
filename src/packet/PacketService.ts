@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { Packet } from './PacketEntity'
+import { Packet } from './Packet.entity'
 import { SendPackageInterface } from './dtos/SendPackageInterface'
 import { CustomerService } from '../customer/CustomerService'
 import { OfficeService } from '../office/OfficeService'
 import { Customer } from '../customer/Customer.entity'
-import { Employee } from '../employee/employee.entity'
+import { Employee } from '../employee/Employee.entity'
 import { Office } from '../office/Office.entity'
 
 @Injectable()

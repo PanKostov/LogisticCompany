@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Office } from './Office.entity'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import { Employee } from '../employee/employee.entity'
+import { Employee } from '../employee/Employee.entity'
 import { EmployeeType } from '../employee/models/EmployeeType'
 import { EmployeeService } from '../employee/EmployeeService'
 
