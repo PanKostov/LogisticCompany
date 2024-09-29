@@ -23,7 +23,7 @@ export class AuthenticationService {
       }
 
       const userResponse = await this.userService.createUser(email, passwordHashed, egn, false)
-      await this.emailService.sendUserWelcome(userResponse, 'testToken')
+      //await this.emailService.sendUserWelcome(userResponse, 'testToken')
 
       return UserMapper.toDto(userResponse)
     } catch (error) {
@@ -77,5 +77,15 @@ export class AuthenticationService {
     } catch (error) {
       throw new HttpException({ message: error.message }, error.status || HttpStatus.INTERNAL_SERVER_ERROR)
     }
+  }
+
+  async sendResetPasswordEmail(email: string, egn: string, newPassword: string) {
+    const user = await this.userService.findByEmailAndEgn(email, egn)
+
+    if (!user) {
+      throw new NotFoundException('Invalid email or egn')
+    }
+
+    await this.emailService.sendResetPassword(email)
   }
 }

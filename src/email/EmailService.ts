@@ -21,4 +21,19 @@ export class EmailService {
       },
     })
   }
+
+  async sendResetPassword(email: string) {
+    const reset_password_url = `example.com/auth/confirm?email=${email}`
+
+    await this.mailerService.sendMail({
+      to: email,
+      from: '"Support Team" <mailtrap@demomailtrap.com>', // override default from
+      subject: 'Welcome to Logistic Company! Confirm your Email',
+      template: '../../email-templates/welcome', // `.ejs` extension is appended automatically
+      context: {
+        // filling <%= %> brackets with contents
+        reset_password_url,
+      },
+    })
+  }
 }

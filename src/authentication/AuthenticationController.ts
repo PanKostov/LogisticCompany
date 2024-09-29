@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Session, UseGuards, SetMetadata } from '@nestjs/common'
+import { Controller, Post, Body, Patch, Session, UseGuards, SetMetadata, Get } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
 import { AuthenticationService } from './AuthenticationService'
 import { User } from '../user/User.entity'
@@ -15,9 +15,8 @@ export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 
   @Post('/signup')
-  async signUp(@Body() body: CreateUserDto, @Session() session: any): Promise<UserResponseDto> {
+  async signUp(@Body() body: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.authService.signUp(body.email, body.password, body.egn)
-    session.user = user
 
     return user
   }
@@ -31,11 +30,17 @@ export class AuthenticationController {
     return user
   }
 
-  @Post('/signout')
+  @Get()
+  getSession(@Session() session: any) {
+    return session
+  }
+
+  @Post('/sign-out')
   signOut(@Session() session: any): void {
     session.user = null
   }
 
+  //TODO - make AuthGuard default guard, and make the endpoint public if necessary
   @Patch('/password')
   @UseGuards(AuthGuard)
   @Throttle({ default: { limit: 5, ttl: FIVE_MINUTES_TTL } })
@@ -44,17 +49,13 @@ export class AuthenticationController {
     await this.authService.updatePassword(session.user.id, body.oldPassword, body.newPassword)
   }
 
-  //TODO: forgot-password - to setup new method - need an email service for that
-  // @Patch('/forgotten-password/user/:id')
-  // @Throttle(3, 60)
-  // async newUserPassword(
-  //   @Param('id') id: string,
-  //   @Body() body: { oldPassword: string; newPassword: string },
-  // ): Promise<User> {
-  //   return await this.authService.updatePassword(
-  //     parseInt(id),
-  //     body.oldPassword,
-  //     body.newPassword,
-  //   );
-  // }
+  @Post('/forgotten-password/user')
+  async sendResetPasswordEmail(@Body() body: { email: string; egn: string; newPassword: string }): Promise<void> {
+    return await this.authService.sendResetPasswordEmail(body.email, body.egn, body.newPassword)
+  }
+
+  @Patch('./forgotten-password/user')
+  async resetPassword(@Body() body: { newPassword: string }) {
+    //TODO - set a reset password
+  }
 }

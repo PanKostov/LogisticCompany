@@ -109,6 +109,12 @@ export class UserService {
     return user?.decryptFields(this.encryptionService)
   }
 
+  async findByEmailAndEgn(email: string, egn: string): Promise<User | undefined> {
+    const encryptedEgn = await this.encryptionService.encrypt(egn)
+    const user = await this.repo.findOneBy({ email, egn: encryptedEgn })
+    return user?.decryptFields(this.encryptionService)
+  }
+
   async getEgnOfUser(id: number): Promise<string> {
     const user = await this.findOne(id)
     if (!user) {
