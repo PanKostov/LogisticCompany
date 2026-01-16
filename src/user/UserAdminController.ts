@@ -49,7 +49,7 @@ export class UserAdminController {
 
   @Patch('user-access/:id')
   @UseGuards(AdminGuard)
-  async updateUserAccess(@Param('id') id: string, { userAccessType }: { userAccessType: UserAccess }) {
+  async updateUserAccess(@Param('id') id: string, @Body() { userAccessType }: { userAccessType: UserAccess }) {
     return await this.usersService.updateUser(parseInt(id), {
       type: userAccessType,
     })
