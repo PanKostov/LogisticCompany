@@ -1,11 +1,12 @@
-import { Controller, Post, Body, Patch, Param, Get } from '@nestjs/common'
+import { Controller, Post, Body, Patch, Param, Get, UseGuards, Query } from '@nestjs/common'
 import { PacketService } from './PacketService'
 import { SendPackageInterface } from './dtos/SendPackageInterface'
 import { Packet } from './Packet.entity'
-
-//TODO: add Auth Guard - to be used only from users who are employees
+import { EmployeeGuard } from '../guards/EmployeeGuard'
+import { AdminGuard } from '../guards/AdminGuard'
 
 @Controller('packet')
+@UseGuards(EmployeeGuard)
 export class PacketController {
   constructor(private readonly packetService: PacketService) {}
   @Post('/sending')
@@ -16,11 +17,6 @@ export class PacketController {
   @Patch('/receiving')
   async receivePacket(@Body() body: { packageId: number; officeId: number }): Promise<Packet> {
     return await this.packetService.receivePacket(body.packageId, body.officeId)
-  }
-
-  @Get(':id')
-  async getPacket(@Param('id') id: string) {
-    return await this.packetService.getPacketById(parseInt(id))
   }
 
   @Get('/all')
@@ -46,5 +42,17 @@ export class PacketController {
   @Get('/received-by-customer/:id')
   async getAllReceivedPacketsForCustomer(@Param('id') id: string) {
     return await this.packetService.getAllReceivedPacketsForCustomer(parseInt(id))
+  }
+
+  @Get('/revenue')
+  @UseGuards(AdminGuard)
+  async getRevenue(@Query('from') from?: string, @Query('to') to?: string) {
+    const total = await this.packetService.getRevenue(from, to)
+    return { total, from: from || null, to: to || null }
+  }
+
+  @Get(':id')
+  async getPacket(@Param('id') id: string) {
+    return await this.packetService.getPacketById(parseInt(id))
   }
 }

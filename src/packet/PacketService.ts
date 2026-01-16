@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Packet } from './Packet.entity'
@@ -32,6 +32,7 @@ export class PacketService {
       toOffice: offices.receiverOffice,
       employeeId: packet.employeeId,
       isReceived: false,
+      price: packet.price ?? 0,
     })
     return this.repo.save(createdPacket)
   }
@@ -74,6 +75,24 @@ export class PacketService {
     return await this.repo.find({ where: { receiver: { id: customerId } } })
   }
 
+  async getRevenue(from?: string, to?: string): Promise<number> {
+    const fromDate = this.parseDate(from, 'from')
+    const toDate = this.parseDate(to, 'to')
+
+    const query = this.repo.createQueryBuilder('packet').select('COALESCE(SUM(packet.price), 0)', 'total')
+
+    if (fromDate) {
+      query.andWhere('packet.createdAt >= :from', { from: fromDate })
+    }
+
+    if (toDate) {
+      query.andWhere('packet.createdAt <= :to', { to: toDate })
+    }
+
+    const result = await query.getRawOne()
+    return Number(result?.total ?? 0)
+  }
+
   private async checkIfCustomersExists(senderId: number, recieverId: number): Promise<{ sender: Customer; receiver: Customer }> {
     const sender = await this.customerService.findById(senderId)
     const receiver = await this.customerService.findById(recieverId)
@@ -104,5 +123,18 @@ export class PacketService {
     }
 
     return employee
+  }
+
+  private parseDate(value: string | undefined, field: string): Date | undefined {
+    if (!value) {
+      return undefined
+    }
+
+    const parsed = new Date(value)
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException(`Invalid ${field} date format`)
+    }
+
+    return parsed
   }
 }

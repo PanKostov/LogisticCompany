@@ -8,6 +8,7 @@ const packetColumns = [
   { key: 'id', label: 'ID' },
   { key: 'employeeId', label: 'Employee' },
   { key: 'weight', label: 'Weight' },
+  { key: 'price', label: 'Price' },
   { key: 'isReceived', label: 'Received' },
 ]
 
@@ -32,6 +33,7 @@ export default function Reports() {
   const [employeeId, setEmployeeId] = useState('')
   const [customerId, setCustomerId] = useState('')
   const [period, setPeriod] = useState({ from: '', to: '' })
+  const [revenue, setRevenue] = useState(null)
 
   const handleEmployees = async () => {
     setStatus('')
@@ -106,9 +108,20 @@ export default function Reports() {
     }
   }
 
-  const handleRevenue = (event) => {
+  const handleRevenue = async (event) => {
     event.preventDefault()
-    setStatus('Revenue calculation requires backend support for packet pricing.')
+    setStatus('')
+    setRevenue(null)
+    try {
+      const query = []
+      if (period.from) query.push(`from=${encodeURIComponent(period.from)}`)
+      if (period.to) query.push(`to=${encodeURIComponent(period.to)}`)
+      const path = `/packet/revenue${query.length ? `?${query.join('&')}` : ''}`
+      const data = await apiFetch(path)
+      setRevenue(data)
+    } catch (error) {
+      setStatus(error.message)
+    }
   }
 
   return (
@@ -185,7 +198,11 @@ export default function Reports() {
             Calculate
           </button>
         </form>
-        <div className="notice warning">Pricing fields are not present in the backend yet.</div>
+        {revenue ? (
+          <div className="notice success">Total revenue: {revenue.total}</div>
+        ) : (
+          <div className="notice info">Run a query to calculate revenue.</div>
+        )}
       </Panel>
 
       {status ? <div className="notice info">{status}</div> : null}

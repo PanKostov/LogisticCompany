@@ -8,6 +8,7 @@ import { apiFetch } from '../api/client'
 const columns = [
   { key: 'id', label: 'ID' },
   { key: 'weight', label: 'Weight' },
+  { key: 'price', label: 'Price' },
   { key: 'employeeId', label: 'Employee' },
   { key: 'isReceived', label: 'Received' },
 ]
@@ -24,6 +25,7 @@ export default function Packets() {
     fromAdress: '',
     toAdress: '',
     weight: '',
+    price: '',
     employeeId: '',
   })
   const [receiveForm, setReceiveForm] = useState({ packageId: '', officeId: '' })
@@ -53,6 +55,7 @@ export default function Packets() {
         fromAdress: sendForm.fromAdress || undefined,
         toAdress: sendForm.toAdress || undefined,
         weight: Number(sendForm.weight),
+        price: sendForm.price ? Number(sendForm.price) : undefined,
         employeeId: Number(sendForm.employeeId),
         isRecieved: false,
       }
@@ -159,6 +162,7 @@ export default function Packets() {
           <Field label="From address" value={sendForm.fromAdress} onChange={(event) => setSendForm((prev) => ({ ...prev, fromAdress: event.target.value }))} />
           <Field label="To address" value={sendForm.toAdress} onChange={(event) => setSendForm((prev) => ({ ...prev, toAdress: event.target.value }))} />
           <Field label="Weight" type="number" step="0.01" value={sendForm.weight} onChange={(event) => setSendForm((prev) => ({ ...prev, weight: event.target.value }))} required />
+          <Field label="Price" type="number" step="0.01" value={sendForm.price} onChange={(event) => setSendForm((prev) => ({ ...prev, price: event.target.value }))} />
           <Field label="Employee ID" value={sendForm.employeeId} onChange={(event) => setSendForm((prev) => ({ ...prev, employeeId: event.target.value }))} required />
           <button className="primary" type="submit">
             Register sent packet

@@ -19,22 +19,31 @@ export class CustomerService {
     createdCustomer.sentPackets = new Array<Packet>()
     createdCustomer.receivedPackets = new Array<Packet>()
 
-    return this.repo.save(createdCustomer)
+    const savedCustomer = await this.repo.save(createdCustomer)
+    return savedCustomer.decryptFields(this.encryptionService)
   }
 
   async updateCustomer(id: number, attrs: Partial<Customer>): Promise<Customer> {
-    const updatedEntity = await this.repo
-      .createQueryBuilder()
-      .update(Customer)
-      .set({
-        ...(attrs.firstName && { firstName: attrs.firstName }),
-        ...(attrs.lastName && { lastName: attrs.lastName }),
-      })
-      .where({ id })
-      .returning('*')
-      .execute()
+    const updates: Partial<Customer> = {}
+    if (attrs.firstName !== undefined) updates.firstName = attrs.firstName
+    if (attrs.lastName !== undefined) updates.lastName = attrs.lastName
+    if (attrs.egn !== undefined) updates.egn = await this.encryptionService.encrypt(attrs.egn)
 
-    return updatedEntity.raw[0]
+    if (Object.keys(updates).length === 0) {
+      return this.findById(id)
+    }
+
+    const updatedEntity = await this.repo.createQueryBuilder().update(Customer).set(updates).where({ id }).returning('*').execute()
+    if (!updatedEntity.raw[0]) {
+      throw new NotFoundException(`Customer with id: ${id} does not exist!`)
+    }
+
+    const updatedCustomer = await this.findById(id)
+    if (!updatedCustomer) {
+      throw new NotFoundException(`Customer with id: ${id} does not exist!`)
+    }
+
+    return updatedCustomer
   }
 
   async findById(id: number): Promise<Customer> {
@@ -89,6 +98,7 @@ export class CustomerService {
   }
 
   async getAllCustomers(): Promise<Customer[]> {
-    return await this.repo.find()
+    const customers = await this.repo.find()
+    return Promise.all(customers.map((customer) => customer.decryptFields(this.encryptionService)))
   }
 }

@@ -1,41 +1,71 @@
 import { useEffect, useState } from 'react'
 import Panel from '../components/Panel'
 import Field from '../components/Field'
+import { apiFetch } from '../api/client'
 
-const storageKey = 'logistiq-company-profile'
+const emptyCompany = {
+  id: null,
+  name: '',
+  legalId: '',
+  address: '',
+  contact: '',
+  notes: '',
+}
 
 export default function Company() {
-  const [company, setCompany] = useState({
-    name: '',
-    legalId: '',
-    address: '',
-    contact: '',
-    notes: '',
-  })
-  const [status, setStatus] = useState('')
+  const [company, setCompany] = useState(emptyCompany)
+  const [status, setStatus] = useState({ type: 'idle', message: '' })
+
+  const loadCompany = async () => {
+    setStatus({ type: 'loading', message: '' })
+    try {
+      const data = await apiFetch('/company')
+      if (data) {
+        setCompany({ ...emptyCompany, ...data })
+      }
+      setStatus({ type: 'idle', message: '' })
+    } catch (error) {
+      setStatus({ type: 'warning', message: error.message })
+    }
+  }
 
   useEffect(() => {
-    const saved = localStorage.getItem(storageKey)
-    if (saved) {
-      setCompany(JSON.parse(saved))
-    }
+    loadCompany()
   }, [])
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault()
-    localStorage.setItem(storageKey, JSON.stringify(company))
-    setStatus('Saved locally. Backend endpoint can replace this later.')
+    setStatus({ type: 'loading', message: '' })
+    try {
+      const payload = buildPayload(company)
+      const data = company.id
+        ? await apiFetch(`/company/${company.id}`, { method: 'PATCH', body: payload })
+        : await apiFetch('/company', { method: 'POST', body: payload })
+      setCompany({ ...emptyCompany, ...data })
+      setStatus({ type: 'success', message: 'Company profile saved.' })
+    } catch (error) {
+      setStatus({ type: 'warning', message: error.message })
+    }
   }
 
-  const handleClear = () => {
-    localStorage.removeItem(storageKey)
-    setCompany({ name: '', legalId: '', address: '', contact: '', notes: '' })
-    setStatus('Cleared local data.')
+  const handleClear = async () => {
+    setStatus({ type: 'loading', message: '' })
+    try {
+      if (company.id) {
+        await apiFetch(`/company/${company.id}`, { method: 'DELETE' })
+      }
+      setCompany(emptyCompany)
+      setStatus({ type: 'success', message: 'Company profile cleared.' })
+    } catch (error) {
+      setStatus({ type: 'warning', message: error.message })
+    }
   }
+
+  const noticeTone = status.type === 'success' ? 'success' : status.type === 'warning' ? 'warning' : 'info'
 
   return (
     <div className="grid">
-      <Panel title="Company profile" subtitle="Stored locally until the backend exposes a company endpoint.">
+      <Panel title="Company profile" subtitle="Manage the primary logistics company record.">
         <form className="form" onSubmit={handleSave}>
           <Field
             label="Company name"
@@ -76,10 +106,10 @@ export default function Company() {
               Save profile
             </button>
             <button className="ghost" type="button" onClick={handleClear}>
-              Clear local
+              Clear record
             </button>
           </div>
-          {status ? <div className="notice success">{status}</div> : null}
+          {status.message ? <div className={`notice ${noticeTone}`}>{status.message}</div> : null}
         </form>
       </Panel>
 
@@ -105,4 +135,14 @@ export default function Company() {
       </Panel>
     </div>
   )
+}
+
+function buildPayload(company) {
+  return {
+    name: company.name,
+    legalId: company.legalId || undefined,
+    address: company.address || undefined,
+    contact: company.contact || undefined,
+    notes: company.notes || undefined,
+  }
 }

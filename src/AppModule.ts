@@ -6,11 +6,13 @@ import { Employee } from './employee/Employee.entity'
 import { Office } from './office/Office.entity'
 import { Customer } from './customer/Customer.entity'
 import { Packet } from './packet/Packet.entity'
+import { Company } from './company/Company.entity'
 import { OfficeModule } from './office/OfficeModule'
 import { EmployeeModule } from './employee/EmployeeModule'
 import { AuthenticationModule } from './authentication/AuthenticationModule'
 import { PacketModule } from './packet/PacketModule'
 import { CustomerModule } from './customer/CustomerModule'
+import { CompanyModule } from './company/CompanyModule'
 import { ThrottlerModule } from '@nestjs/throttler'
 import { ONE_MINUTE_TTL } from './utils/RateLimitting'
 import { ConfigModule } from '@nestjs/config'
@@ -29,10 +31,10 @@ import { ConfigModule } from '@nestjs/config'
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [User, Office, Employee, Customer, Packet],
+      entities: [User, Office, Employee, Customer, Packet, Company],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Office, Employee, Customer, Packet]),
+    TypeOrmModule.forFeature([User, Office, Employee, Customer, Packet, Company]),
     ThrottlerModule.forRoot([
       {
         ttl: ONE_MINUTE_TTL,
@@ -45,6 +47,7 @@ import { ConfigModule } from '@nestjs/config'
     AuthenticationModule,
     PacketModule,
     CustomerModule,
+    CompanyModule,
   ],
 })
 export class AppModule {}

@@ -1,10 +1,12 @@
-import { Controller, Post, Patch, Delete, Get, Param, Body, HttpException } from '@nestjs/common'
+import { Controller, Post, Patch, Delete, Get, Param, Body, HttpException, UseGuards } from '@nestjs/common'
 import { CustomerService } from './CustomerService'
 import { Customer } from './Customer.entity'
 import { CustomerDto } from './dtos/CustomerDto.dto'
 import { UpdateCustomerDto } from './dtos/UpdateCustomerDto.dto'
+import { EmployeeGuard } from '../guards/EmployeeGuard'
 
 @Controller('customer')
+@UseGuards(EmployeeGuard)
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 

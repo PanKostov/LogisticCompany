@@ -34,7 +34,7 @@ export class Customer {
   }
 
   async decryptFields(encryptionService: EncryptionService): Promise<Customer> {
-    this.egn = await encryptionService.encrypt(this.egn)
+    this.egn = await encryptionService.decrypt(this.egn)
     return this
   }
 }

@@ -3,12 +3,12 @@ import { NavLink, useLocation } from 'react-router-dom'
 const navItems = [
   { path: '/', label: 'Dashboard', accent: 'flare' },
   { path: '/auth', label: 'Access', accent: 'pulse' },
-  { path: '/company', label: 'Company', accent: 'flare' },
+  { path: '/company', label: 'Company', accent: 'flare', adminOnly: true },
   { path: '/users', label: 'Users', accent: 'pulse', adminOnly: true },
   { path: '/employees', label: 'Employees', accent: 'flare', adminOnly: true },
-  { path: '/customers', label: 'Customers', accent: 'pulse' },
+  { path: '/customers', label: 'Customers', accent: 'pulse', staffOnly: true },
   { path: '/offices', label: 'Offices', accent: 'flare', adminOnly: true },
-  { path: '/packets', label: 'Packets', accent: 'pulse' },
+  { path: '/packets', label: 'Packets', accent: 'pulse', staffOnly: true },
   { path: '/reports', label: 'Reports', accent: 'flare', adminOnly: true },
 ]
 
@@ -22,7 +22,12 @@ export default function AppShell({ session, onRefreshSession, onSignOut, childre
   const pageTitle = routeTitles[location.pathname] || 'Console'
   const user = session?.user
   const isAdmin = user?.type === 'administrator'
-  const visibleNavItems = navItems.filter((item) => !item.adminOnly || isAdmin)
+  const isStaff = isAdmin || user?.isEmployee
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false
+    if (item.staffOnly && !isStaff) return false
+    return true
+  })
 
   return (
     <div className="app-shell">

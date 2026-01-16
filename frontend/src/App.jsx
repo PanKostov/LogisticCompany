@@ -16,7 +16,7 @@ import Reports from './pages/Reports'
 export default function App() {
   const [session, setSession] = useState({ status: 'idle', user: null, raw: null, error: null })
   const isAdmin = session?.user?.type === 'administrator'
-  console.log('ADMIN ', session)
+  const isStaff = isAdmin || session?.user?.isEmployee
 
   const refreshSession = useCallback(async () => {
     setSession((prev) => ({ ...prev, status: 'loading', error: null }))
@@ -56,17 +56,23 @@ export default function App() {
     </AccessGate>
   )
 
+  const staffOnly = (element) => (
+    <AccessGate allowed={isStaff} title="Staff access required" message="These tools are available to employees and administrators.">
+      {element}
+    </AccessGate>
+  )
+
   return (
     <AppShell session={session} onRefreshSession={refreshSession} onSignOut={signOut}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/auth" element={<Auth session={session} onLogin={login} onSignup={signup} />} />
-        <Route path="/company" element={<Company />} />
+        <Route path="/company" element={adminOnly(<Company />)} />
         <Route path="/users" element={adminOnly(<Users />)} />
         <Route path="/employees" element={adminOnly(<Employees />)} />
-        <Route path="/customers" element={<Customers />} />
+        <Route path="/customers" element={staffOnly(<Customers />)} />
         <Route path="/offices" element={adminOnly(<Offices />)} />
-        <Route path="/packets" element={<Packets />} />
+        <Route path="/packets" element={staffOnly(<Packets />)} />
         <Route path="/reports" element={adminOnly(<Reports />)} />
       </Routes>
     </AppShell>

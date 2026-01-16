@@ -36,20 +36,32 @@ export class UserService {
       throw new HttpException("You can't change password here", 400)
     }
 
-    const updatedEntity = await this.repo
-      .createQueryBuilder()
-      .update(User)
-      .set({
-        ...(attrs.email && { email: attrs.email }),
-        ...(attrs.userName && { userName: attrs.userName }),
-        ...(attrs.isEmployee && { isEmployee: attrs.isEmployee }),
-        ...(attrs.type && { type: attrs.type }),
-      })
-      .where({ id })
-      .returning('*')
-      .execute()
+    const updates: Partial<User> = {}
+    if (attrs.email !== undefined) updates.email = attrs.email
+    if (attrs.userName !== undefined) updates.userName = attrs.userName
+    if (typeof attrs.isEmployee === 'boolean') updates.isEmployee = attrs.isEmployee
+    if (attrs.type !== undefined) updates.type = attrs.type
+    if (attrs.egn !== undefined) updates.egn = await this.encryptionService.encrypt(attrs.egn)
 
-    return updatedEntity.raw[0]
+    if (Object.keys(updates).length === 0) {
+      const user = await this.findOne(id)
+      if (!user) {
+        throw new NotFoundException('User not found')
+      }
+      return user
+    }
+
+    const updatedEntity = await this.repo.createQueryBuilder().update(User).set(updates).where({ id }).returning('*').execute()
+    if (!updatedEntity.raw[0]) {
+      throw new NotFoundException('User not found')
+    }
+
+    const updatedUser = await this.findOne(id)
+    if (!updatedUser) {
+      throw new NotFoundException('User not found')
+    }
+
+    return updatedUser
   }
 
   async updatePassword(id: number, attrs: Partial<User>): Promise<User> {
@@ -71,13 +83,22 @@ export class UserService {
       .createQueryBuilder()
       .update(User)
       .set({
-        ...(isEmployee && { isEmployee }),
+        isEmployee,
       })
       .where({ id })
       .returning('*')
       .execute()
 
-    return updatedEntity.raw[0]
+    if (!updatedEntity.raw[0]) {
+      throw new NotFoundException('User not found')
+    }
+
+    const updatedUser = await this.findOne(id)
+    if (!updatedUser) {
+      throw new NotFoundException('User not found')
+    }
+
+    return updatedUser
   }
 
   async remove(id: number): Promise<User> {

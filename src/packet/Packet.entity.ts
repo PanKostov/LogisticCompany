@@ -10,6 +10,9 @@ export class Packet {
   @Column({ type: 'numeric', precision: 6, scale: 2 })
   weight: number
 
+  @Column({ type: 'numeric', precision: 8, scale: 2, default: 0 })
+  price: number
+
   @Column({ type: 'varchar', nullable: true })
   fromAddress: string
 
