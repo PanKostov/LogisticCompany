@@ -31,6 +31,7 @@ export class CustomerService {
     const updates: Partial<Customer> = {}
     if (attrs.firstName !== undefined) updates.firstName = attrs.firstName
     if (attrs.lastName !== undefined) updates.lastName = attrs.lastName
+    // EGN is stored encrypted in the database.
     if (attrs.egn !== undefined) updates.egn = await this.encryptionService.encrypt(attrs.egn)
 
     if (Object.keys(updates).length === 0) {

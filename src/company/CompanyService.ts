@@ -15,6 +15,7 @@ export class CompanyService {
   }
 
   async getCompany(): Promise<Company | null> {
+    // Single-company setup: return the first record if it exists.
     const companies = await this.repo.find({ order: { id: 'ASC' }, take: 1 })
     return companies[0] ?? null
   }

@@ -24,8 +24,8 @@ export default function Packets({ session }) {
     receiverId: '',
     fromOfficeId: '',
     toOfficeId: '',
-    fromAdress: '',
-    toAdress: '',
+    fromAddress: '',
+    toAddress: '',
     weight: '',
     employeeId: '',
   })
@@ -36,11 +36,11 @@ export default function Packets({ session }) {
     receiverId: '',
     fromOfficeId: '',
     toOfficeId: '',
-    fromAdress: '',
-    toAdress: '',
+    fromAddress: '',
+    toAddress: '',
     weight: '',
     employeeId: '',
-    isRecieved: '',
+    isReceived: '',
   })
   const [deleteId, setDeleteId] = useState('')
   const [packetId, setPacketId] = useState('')
@@ -66,11 +66,11 @@ export default function Packets({ session }) {
         receiverId: Number(sendForm.receiverId),
         fromOfficeId: sendForm.fromOfficeId ? Number(sendForm.fromOfficeId) : undefined,
         toOfficeId: sendForm.toOfficeId ? Number(sendForm.toOfficeId) : undefined,
-        fromAdress: sendForm.fromAdress || undefined,
-        toAdress: sendForm.toAdress || undefined,
+        fromAddress: sendForm.fromAddress || undefined,
+        toAddress: sendForm.toAddress || undefined,
         weight: Number(sendForm.weight),
         employeeId: Number(sendForm.employeeId),
-        isRecieved: false,
+        isReceived: false,
       }
       const data = await apiFetch('/packet/sending', { method: 'POST', body: payload })
       setResult(data)
@@ -211,6 +211,7 @@ export default function Packets({ session }) {
 
   return (
     <div className="grid">
+      {/* Staff have full operational controls; customers see only their own packets. */}
       {isStaff ? (
         <>
           <Panel title="Packets" subtitle="View all registered packets.">
@@ -227,14 +228,53 @@ export default function Packets({ session }) {
 
           <Panel title="Send packet" subtitle="Register a new outbound shipment.">
             <form className="form" onSubmit={handleSend}>
-              <Field label="Sender ID" value={sendForm.senderId} onChange={(event) => setSendForm((prev) => ({ ...prev, senderId: event.target.value }))} required />
-              <Field label="Receiver ID" value={sendForm.receiverId} onChange={(event) => setSendForm((prev) => ({ ...prev, receiverId: event.target.value }))} required />
-              <Field label="From office ID" value={sendForm.fromOfficeId} onChange={(event) => setSendForm((prev) => ({ ...prev, fromOfficeId: event.target.value }))} required />
-              <Field label="To office ID" value={sendForm.toOfficeId} onChange={(event) => setSendForm((prev) => ({ ...prev, toOfficeId: event.target.value }))} />
-              <Field label="From address" value={sendForm.fromAdress} onChange={(event) => setSendForm((prev) => ({ ...prev, fromAdress: event.target.value }))} />
-              <Field label="To address" value={sendForm.toAdress} onChange={(event) => setSendForm((prev) => ({ ...prev, toAdress: event.target.value }))} />
-              <Field label="Weight" type="number" step="0.01" value={sendForm.weight} onChange={(event) => setSendForm((prev) => ({ ...prev, weight: event.target.value }))} required />
-              <Field label="Employee ID" value={sendForm.employeeId} onChange={(event) => setSendForm((prev) => ({ ...prev, employeeId: event.target.value }))} required />
+              <Field
+                label="Sender ID"
+                value={sendForm.senderId}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, senderId: event.target.value }))}
+                required
+              />
+              <Field
+                label="Receiver ID"
+                value={sendForm.receiverId}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, receiverId: event.target.value }))}
+                required
+              />
+              <Field
+                label="From office ID"
+                value={sendForm.fromOfficeId}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, fromOfficeId: event.target.value }))}
+                required
+              />
+              <Field
+                label="To office ID"
+                value={sendForm.toOfficeId}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, toOfficeId: event.target.value }))}
+              />
+              <Field
+                label="From address"
+                value={sendForm.fromAddress}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, fromAddress: event.target.value }))}
+              />
+              <Field
+                label="To address"
+                value={sendForm.toAddress}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, toAddress: event.target.value }))}
+              />
+              <Field
+                label="Weight"
+                type="number"
+                step="0.01"
+                value={sendForm.weight}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, weight: event.target.value }))}
+                required
+              />
+              <Field
+                label="Employee ID"
+                value={sendForm.employeeId}
+                onChange={(event) => setSendForm((prev) => ({ ...prev, employeeId: event.target.value }))}
+                required
+              />
               <button className="primary" type="submit">
                 Register sent packet
               </button>
@@ -243,8 +283,18 @@ export default function Packets({ session }) {
 
           <Panel title="Receive packet" subtitle="Mark a packet as delivered to an office.">
             <form className="form" onSubmit={handleReceive}>
-              <Field label="Packet ID" value={receiveForm.packageId} onChange={(event) => setReceiveForm((prev) => ({ ...prev, packageId: event.target.value }))} required />
-              <Field label="Office ID" value={receiveForm.officeId} onChange={(event) => setReceiveForm((prev) => ({ ...prev, officeId: event.target.value }))} required />
+              <Field
+                label="Packet ID"
+                value={receiveForm.packageId}
+                onChange={(event) => setReceiveForm((prev) => ({ ...prev, packageId: event.target.value }))}
+                required
+              />
+              <Field
+                label="Office ID"
+                value={receiveForm.officeId}
+                onChange={(event) => setReceiveForm((prev) => ({ ...prev, officeId: event.target.value }))}
+                required
+              />
               <button className="primary" type="submit">
                 Mark received
               </button>
@@ -253,18 +303,57 @@ export default function Packets({ session }) {
 
           <Panel title="Update packet" subtitle="Adjust packet details.">
             <form className="form" onSubmit={handleUpdate}>
-              <Field label="Packet ID" value={updateForm.id} onChange={(event) => setUpdateForm((prev) => ({ ...prev, id: event.target.value }))} required />
-              <Field label="Sender ID" value={updateForm.senderId} onChange={(event) => setUpdateForm((prev) => ({ ...prev, senderId: event.target.value }))} />
-              <Field label="Receiver ID" value={updateForm.receiverId} onChange={(event) => setUpdateForm((prev) => ({ ...prev, receiverId: event.target.value }))} />
-              <Field label="From office ID" value={updateForm.fromOfficeId} onChange={(event) => setUpdateForm((prev) => ({ ...prev, fromOfficeId: event.target.value }))} />
-              <Field label="To office ID" value={updateForm.toOfficeId} onChange={(event) => setUpdateForm((prev) => ({ ...prev, toOfficeId: event.target.value }))} />
-              <Field label="From address" value={updateForm.fromAdress} onChange={(event) => setUpdateForm((prev) => ({ ...prev, fromAdress: event.target.value }))} />
-              <Field label="To address" value={updateForm.toAdress} onChange={(event) => setUpdateForm((prev) => ({ ...prev, toAdress: event.target.value }))} />
-              <Field label="Weight" type="number" step="0.01" value={updateForm.weight} onChange={(event) => setUpdateForm((prev) => ({ ...prev, weight: event.target.value }))} />
-              <Field label="Employee ID" value={updateForm.employeeId} onChange={(event) => setUpdateForm((prev) => ({ ...prev, employeeId: event.target.value }))} />
+              <Field
+                label="Packet ID"
+                value={updateForm.id}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, id: event.target.value }))}
+                required
+              />
+              <Field
+                label="Sender ID"
+                value={updateForm.senderId}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, senderId: event.target.value }))}
+              />
+              <Field
+                label="Receiver ID"
+                value={updateForm.receiverId}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, receiverId: event.target.value }))}
+              />
+              <Field
+                label="From office ID"
+                value={updateForm.fromOfficeId}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, fromOfficeId: event.target.value }))}
+              />
+              <Field
+                label="To office ID"
+                value={updateForm.toOfficeId}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, toOfficeId: event.target.value }))}
+              />
+              <Field
+                label="From address"
+                value={updateForm.fromAddress}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, fromAddress: event.target.value }))}
+              />
+              <Field
+                label="To address"
+                value={updateForm.toAddress}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, toAddress: event.target.value }))}
+              />
+              <Field
+                label="Weight"
+                type="number"
+                step="0.01"
+                value={updateForm.weight}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, weight: event.target.value }))}
+              />
+              <Field
+                label="Employee ID"
+                value={updateForm.employeeId}
+                onChange={(event) => setUpdateForm((prev) => ({ ...prev, employeeId: event.target.value }))}
+              />
               <label className="field">
                 <span>Received</span>
-                <select value={updateForm.isRecieved} onChange={(event) => setUpdateForm((prev) => ({ ...prev, isRecieved: event.target.value }))}>
+                <select value={updateForm.isReceived} onChange={(event) => setUpdateForm((prev) => ({ ...prev, isReceived: event.target.value }))}>
                   <option value="">Leave unchanged</option>
                   <option value="true">true</option>
                   <option value="false">false</option>
@@ -345,11 +434,11 @@ function buildUpdatePayload(form) {
   if (form.receiverId) payload.receiverId = Number(form.receiverId)
   if (form.fromOfficeId) payload.fromOfficeId = Number(form.fromOfficeId)
   if (form.toOfficeId) payload.toOfficeId = Number(form.toOfficeId)
-  if (form.fromAdress) payload.fromAdress = form.fromAdress
-  if (form.toAdress) payload.toAdress = form.toAdress
+  if (form.fromAddress) payload.fromAddress = form.fromAddress
+  if (form.toAddress) payload.toAddress = form.toAddress
   if (form.weight) payload.weight = Number(form.weight)
   if (form.employeeId) payload.employeeId = Number(form.employeeId)
-  if (form.isRecieved === 'true') payload.isRecieved = true
-  if (form.isRecieved === 'false') payload.isRecieved = false
+  if (form.isReceived === 'true') payload.isReceived = true
+  if (form.isReceived === 'false') payload.isReceived = false
   return payload
 }

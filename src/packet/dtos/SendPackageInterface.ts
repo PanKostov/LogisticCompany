@@ -3,9 +3,9 @@ export interface SendPackageInterface {
   receiverId: number
   fromOfficeId?: number
   toOfficeId?: number
-  fromAdress?: string
-  toAdress?: string
+  fromAddress?: string
+  toAddress?: string
   weight: number
   employeeId: number
-  isRecieved: boolean
+  isReceived: boolean
 }

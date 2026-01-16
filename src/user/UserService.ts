@@ -41,6 +41,7 @@ export class UserService {
     if (attrs.userName !== undefined) updates.userName = attrs.userName
     if (typeof attrs.isEmployee === 'boolean') updates.isEmployee = attrs.isEmployee
     if (attrs.type !== undefined) updates.type = attrs.type
+    // Persist EGN encrypted at rest.
     if (attrs.egn !== undefined) updates.egn = await this.encryptionService.encrypt(attrs.egn)
 
     if (Object.keys(updates).length === 0) {

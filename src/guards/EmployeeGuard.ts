@@ -11,6 +11,7 @@ export class EmployeeGuard implements CanActivate {
       return false
     }
 
+    // Admins have full access; staff are identified by isEmployee flag.
     if (user.type === UserAccess.ADMIN) {
       return true
     }

@@ -21,15 +21,16 @@ export class PacketService {
     const customers = await this.checkIfCustomersExists(packet.senderId, packet.receiverId)
     const offices = await this.checkIfOfficesExists(packet.fromOfficeId, packet.toOfficeId)
     await this.checkIfEmployeeExists(packet.fromOfficeId, packet.employeeId)
-    const price = this.calculatePrice(packet.weight, packet.toAdress, packet.toOfficeId)
+    // Price is derived from weight and delivery target (office vs address).
+    const price = this.calculatePrice(packet.weight, packet.toAddress, packet.toOfficeId)
 
     const createdPacket = this.repo.create({
       weight: packet.weight,
-      fromAddress: packet.fromAdress,
+      fromAddress: packet.fromAddress,
       fromOffice: offices.senderOffice,
       sender: customers.sender,
       receiver: customers.receiver,
-      toAddress: packet.toAdress,
+      toAddress: packet.toAddress,
       toOffice: offices.receiverOffice,
       employeeId: packet.employeeId,
       isReceived: false,
@@ -63,11 +64,11 @@ export class PacketService {
       receiverId?: number
       fromOfficeId?: number
       toOfficeId?: number
-      fromAdress?: string
-      toAdress?: string
+      fromAddress?: string
+      toAddress?: string
       weight?: number
       employeeId?: number
-      isRecieved?: boolean
+      isReceived?: boolean
     },
   ): Promise<Packet> {
     const packet = await this.repo.findOne({
@@ -90,11 +91,11 @@ export class PacketService {
     if (payload.toOfficeId !== undefined) {
       packet.toOffice = await this.officeService.getOfficeById(payload.toOfficeId)
     }
-    if (payload.fromAdress !== undefined) {
-      packet.fromAddress = payload.fromAdress
+    if (payload.fromAddress !== undefined) {
+      packet.fromAddress = payload.fromAddress
     }
-    if (payload.toAdress !== undefined) {
-      packet.toAddress = payload.toAdress
+    if (payload.toAddress !== undefined) {
+      packet.toAddress = payload.toAddress
     }
     if (payload.weight !== undefined) {
       packet.weight = payload.weight
@@ -102,8 +103,8 @@ export class PacketService {
     if (payload.employeeId !== undefined) {
       packet.employeeId = payload.employeeId
     }
-    if (payload.isRecieved !== undefined) {
-      packet.isReceived = payload.isRecieved
+    if (payload.isReceived !== undefined) {
+      packet.isReceived = payload.isReceived
     }
 
     if (payload.employeeId !== undefined || payload.fromOfficeId !== undefined) {
@@ -114,6 +115,7 @@ export class PacketService {
       await this.checkIfEmployeeExists(officeId, packet.employeeId)
     }
 
+    // Recalculate price if weight or delivery target changed.
     packet.price = this.calculatePrice(packet.weight, packet.toAddress, packet.toOffice?.id)
 
     return this.repo.save(packet)
@@ -178,7 +180,7 @@ export class PacketService {
 
   private async checkIfOfficesExists(
     senderOfficeId: number | undefined,
-    recieverOfficeId: number | undefined,
+    receiverOfficeId: number | undefined,
   ): Promise<{ senderOffice?: Office; receiverOffice?: Office }> {
     let senderOffice
     let receiverOffice
@@ -186,8 +188,8 @@ export class PacketService {
       senderOffice = await this.officeService.getOfficeById(senderOfficeId)
     }
 
-    if (recieverOfficeId) {
-      receiverOffice = await this.officeService.getOfficeById(recieverOfficeId)
+    if (receiverOfficeId) {
+      receiverOffice = await this.officeService.getOfficeById(receiverOfficeId)
     }
 
     return { senderOffice, receiverOffice }
@@ -215,11 +217,12 @@ export class PacketService {
     return parsed
   }
 
-  private calculatePrice(weight: number, toAdress?: string, toOfficeId?: number): number {
+  private calculatePrice(weight: number, toAddress?: string, toOfficeId?: number): number {
+    // Office delivery is cheaper; address delivery adds a surcharge.
     const baseRate = 2
     const addressSurcharge = 5
     const safeWeight = Number.isFinite(weight) ? Math.max(weight, 0) : 0
-    const isAddressDelivery = Boolean(toAdress && toAdress.trim().length > 0) || !toOfficeId
+    const isAddressDelivery = Boolean(toAddress && toAddress.trim().length > 0) || !toOfficeId
 
     return Number((safeWeight * baseRate + (isAddressDelivery ? addressSurcharge : 0)).toFixed(2))
   }

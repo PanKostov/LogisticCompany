@@ -19,11 +19,11 @@ export class UpdatePacketDto {
 
   @IsOptional()
   @IsString()
-  fromAdress?: string
+  fromAddress?: string
 
   @IsOptional()
   @IsString()
-  toAdress?: string
+  toAddress?: string
 
   @IsOptional()
   @IsNumber()
@@ -35,5 +35,5 @@ export class UpdatePacketDto {
 
   @IsOptional()
   @IsBoolean()
-  isRecieved?: boolean
+  isReceived?: boolean
 }
