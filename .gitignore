@@ -1,6 +1,8 @@
 # compiled output
 /dist
+/frontend/dist
 /node_modules
+/frontend/node_modules
 
 # Logs
 logs
@@ -37,6 +39,7 @@ lerna-debug.log*
 # ENV
 # TODO: uncomment later
 # .env
+/frontend/.env
 
 # Data
 /data
