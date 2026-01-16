@@ -25,19 +25,30 @@ export class EmployeeService {
   }
 
   async updateEmployee(id: number, attrs: Partial<Employee>): Promise<Employee> {
-    const updatedEntity = await this.repo
-      .createQueryBuilder()
-      .update(Employee)
-      .set({
-        ...(attrs.firstName && { firstName: attrs.firstName }),
-        ...(attrs.lastName && { lastName: attrs.lastName }),
-        ...(attrs.type && { type: attrs.type }),
-      })
-      .where({ id })
-      .returning('*')
-      .execute()
+    const updates: Partial<Employee> = {}
+    if (attrs.firstName !== undefined) updates.firstName = attrs.firstName
+    if (attrs.lastName !== undefined) updates.lastName = attrs.lastName
+    if (attrs.type !== undefined) updates.type = attrs.type
+
+    if (Object.keys(updates).length === 0) {
+      return this.getEmployeeById(id)
+    }
+
+    const updatedEntity = await this.repo.createQueryBuilder().update(Employee).set(updates).where({ id }).returning('*').execute()
+
+    if (!updatedEntity.raw[0]) {
+      throw new NotFoundException(`Employee with id: ${id} does not exist`)
+    }
 
     return updatedEntity.raw[0]
+  }
+
+  async getEmployeeById(id: number): Promise<Employee> {
+    const employee = await this.repo.findOneBy({ id })
+    if (!employee) {
+      throw new NotFoundException(`Employee with id: ${id} does not exist`)
+    }
+    return employee
   }
 
   async getOfficeEmployees(officeId: number): Promise<Employee[]> {
@@ -49,10 +60,7 @@ export class EmployeeService {
   }
 
   async deleteEmployee(id: number): Promise<Employee> {
-    const employee = await this.repo.findOneBy({ id })
-    if (!employee) {
-      throw new NotFoundException(`Employee with id: ${id} does not exist`)
-    }
+    const employee = await this.getEmployeeById(id)
     return await this.repo.remove(employee)
   }
 

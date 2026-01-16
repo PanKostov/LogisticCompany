@@ -8,7 +8,11 @@ import { EncryptionService } from '../encryption-service/EncryptionService'
 
 @Injectable()
 export class CustomerService {
-  constructor(@InjectRepository(Customer) private repo: Repository<Customer>, private readonly encryptionService: EncryptionService) {
+  constructor(
+    @InjectRepository(Customer) private repo: Repository<Customer>,
+    @InjectRepository(Packet) private packetRepo: Repository<Packet>,
+    private readonly encryptionService: EncryptionService,
+  ) {
     this.encryptionService = new EncryptionService(process.env.ENCRYPTION_KEY)
   }
 
@@ -80,21 +84,15 @@ export class CustomerService {
 
   //TODO: - these 3 methods to be tested(used in the user service)
   async getSentPackets(id: number): Promise<Packet[]> {
-    const customer = await this.repo.findOne({
-      where: { id },
-      relations: ['sentPackets'],
-    })
-
-    return customer.sentPackets
+    return await this.packetRepo.find({ where: { sender: { id } } })
   }
 
   async getReceivedPackets(id: number): Promise<Packet[]> {
-    const customer = await this.repo.findOne({
-      where: { id },
-      relations: ['receivedPackets'],
-    })
+    return await this.packetRepo.find({ where: { receiver: { id }, isReceived: true } })
+  }
 
-    return customer.receivedPackets
+  async getExpectedPackets(id: number): Promise<Packet[]> {
+    return await this.packetRepo.find({ where: { receiver: { id }, isReceived: false } })
   }
 
   async getAllCustomers(): Promise<Customer[]> {

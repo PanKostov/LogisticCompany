@@ -17,6 +17,7 @@ export default function App() {
   const [session, setSession] = useState({ status: 'idle', user: null, raw: null, error: null })
   const isAdmin = session?.user?.type === 'administrator'
   const isStaff = isAdmin || session?.user?.isEmployee
+  const isSignedIn = Boolean(session?.user?.id)
 
   const refreshSession = useCallback(async () => {
     setSession((prev) => ({ ...prev, status: 'loading', error: null }))
@@ -62,6 +63,12 @@ export default function App() {
     </AccessGate>
   )
 
+  const authOnly = (element) => (
+    <AccessGate allowed={isSignedIn} title="Sign in required" message="Please sign in to access this section.">
+      {element}
+    </AccessGate>
+  )
+
   return (
     <AppShell session={session} onRefreshSession={refreshSession} onSignOut={signOut}>
       <Routes>
@@ -72,7 +79,7 @@ export default function App() {
         <Route path="/employees" element={adminOnly(<Employees />)} />
         <Route path="/customers" element={staffOnly(<Customers />)} />
         <Route path="/offices" element={adminOnly(<Offices />)} />
-        <Route path="/packets" element={staffOnly(<Packets />)} />
+        <Route path="/packets" element={authOnly(<Packets session={session} />)} />
         <Route path="/reports" element={adminOnly(<Reports />)} />
       </Routes>
     </AppShell>

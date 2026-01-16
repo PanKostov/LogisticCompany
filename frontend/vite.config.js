@@ -12,6 +12,7 @@ export default defineConfig({
       '/customer': 'http://localhost:3000',
       '/office': 'http://localhost:3000',
       '/packet': 'http://localhost:3000',
+      '/company': 'http://localhost:3000',
     },
   },
 })

@@ -38,4 +38,10 @@ export class UserController {
   async getReceivedPacketsForUser(@Session() session: any) {
     return await this.usersService.receivedPacketsForUser(session.user.id)
   }
+
+  @Get('/expected-packets')
+  @UseGuards(AuthGuard)
+  async getExpectedPacketsForUser(@Session() session: any) {
+    return await this.usersService.expectedPacketsForUser(session.user.id)
+  }
 }

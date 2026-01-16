@@ -8,7 +8,7 @@ const navItems = [
   { path: '/employees', label: 'Employees', accent: 'flare', adminOnly: true },
   { path: '/customers', label: 'Customers', accent: 'pulse', staffOnly: true },
   { path: '/offices', label: 'Offices', accent: 'flare', adminOnly: true },
-  { path: '/packets', label: 'Packets', accent: 'pulse', staffOnly: true },
+  { path: '/packets', label: 'Packets', accent: 'pulse', authOnly: true },
   { path: '/reports', label: 'Reports', accent: 'flare', adminOnly: true },
 ]
 
@@ -23,9 +23,11 @@ export default function AppShell({ session, onRefreshSession, onSignOut, childre
   const user = session?.user
   const isAdmin = user?.type === 'administrator'
   const isStaff = isAdmin || user?.isEmployee
+  const isSignedIn = Boolean(user?.id)
   const visibleNavItems = navItems.filter((item) => {
     if (item.adminOnly && !isAdmin) return false
     if (item.staffOnly && !isStaff) return false
+    if (item.authOnly && !isSignedIn) return false
     return true
   })
 
@@ -41,11 +43,7 @@ export default function AppShell({ session, onRefreshSession, onSignOut, childre
         </div>
         <nav className="nav-list">
           {visibleNavItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
+            <NavLink key={item.path} to={item.path} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <span className={`nav-dot ${item.accent}`} />
               {item.label}
             </NavLink>
@@ -53,9 +51,7 @@ export default function AppShell({ session, onRefreshSession, onSignOut, childre
         </nav>
         <div className="session-card">
           <div className="session-label">Session</div>
-          <div className="session-status">
-            {session?.status === 'loading' ? 'Checking...' : user ? 'Signed in' : 'Signed out'}
-          </div>
+          <div className="session-status">{session?.status === 'loading' ? 'Checking...' : user ? 'Signed in' : 'Signed out'}</div>
           <div className="session-meta">
             {user ? (
               <>

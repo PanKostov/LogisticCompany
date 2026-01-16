@@ -6,7 +6,6 @@ export interface SendPackageInterface {
   fromAdress?: string
   toAdress?: string
   weight: number
-  price?: number
   employeeId: number
   isRecieved: boolean
 }

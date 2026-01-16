@@ -172,4 +172,10 @@ export class UserService {
 
     return await this.customerService.getReceivedPackets(customer.id)
   }
+
+  async expectedPacketsForUser(id: number): Promise<Packet[]> {
+    const customer = await this.findCustomerWithSameEgn(id)
+
+    return await this.customerService.getExpectedPackets(customer.id)
+  }
 }
