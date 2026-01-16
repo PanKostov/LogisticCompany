@@ -1,5 +1,9 @@
+import { UserAccess } from '../models/UserAccess.enum'
+
 export class UserResponseDto {
-  isEmployee: boolean;
-  email: string;
-  userName: string;
+  id: number
+  email: string
+  userName: string
+  isEmployee: boolean
+  type: UserAccess
 }

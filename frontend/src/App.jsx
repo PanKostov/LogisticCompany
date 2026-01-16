@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import AppShell from './components/AppShell'
+import AccessGate from './components/AccessGate'
 import { apiFetch } from './api/client'
 import Dashboard from './pages/Dashboard'
 import Auth from './pages/Auth'
@@ -14,6 +15,8 @@ import Reports from './pages/Reports'
 
 export default function App() {
   const [session, setSession] = useState({ status: 'idle', user: null, raw: null, error: null })
+  const isAdmin = session?.user?.type === 'administrator'
+  console.log('ADMIN ', session)
 
   const refreshSession = useCallback(async () => {
     setSession((prev) => ({ ...prev, status: 'loading', error: null }))
@@ -47,18 +50,24 @@ export default function App() {
     refreshSession()
   }, [refreshSession])
 
+  const adminOnly = (element) => (
+    <AccessGate allowed={isAdmin} title="Admin access required" message="These tools are restricted to administrator accounts.">
+      {element}
+    </AccessGate>
+  )
+
   return (
     <AppShell session={session} onRefreshSession={refreshSession} onSignOut={signOut}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/auth" element={<Auth session={session} onLogin={login} onSignup={signup} />} />
         <Route path="/company" element={<Company />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/employees" element={<Employees />} />
+        <Route path="/users" element={adminOnly(<Users />)} />
+        <Route path="/employees" element={adminOnly(<Employees />)} />
         <Route path="/customers" element={<Customers />} />
-        <Route path="/offices" element={<Offices />} />
+        <Route path="/offices" element={adminOnly(<Offices />)} />
         <Route path="/packets" element={<Packets />} />
-        <Route path="/reports" element={<Reports />} />
+        <Route path="/reports" element={adminOnly(<Reports />)} />
       </Routes>
     </AppShell>
   )

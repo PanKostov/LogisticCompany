@@ -4,12 +4,12 @@ const navItems = [
   { path: '/', label: 'Dashboard', accent: 'flare' },
   { path: '/auth', label: 'Access', accent: 'pulse' },
   { path: '/company', label: 'Company', accent: 'flare' },
-  { path: '/users', label: 'Users', accent: 'pulse' },
-  { path: '/employees', label: 'Employees', accent: 'flare' },
+  { path: '/users', label: 'Users', accent: 'pulse', adminOnly: true },
+  { path: '/employees', label: 'Employees', accent: 'flare', adminOnly: true },
   { path: '/customers', label: 'Customers', accent: 'pulse' },
-  { path: '/offices', label: 'Offices', accent: 'flare' },
+  { path: '/offices', label: 'Offices', accent: 'flare', adminOnly: true },
   { path: '/packets', label: 'Packets', accent: 'pulse' },
-  { path: '/reports', label: 'Reports', accent: 'flare' },
+  { path: '/reports', label: 'Reports', accent: 'flare', adminOnly: true },
 ]
 
 const routeTitles = navItems.reduce((acc, item) => {
@@ -21,6 +21,8 @@ export default function AppShell({ session, onRefreshSession, onSignOut, childre
   const location = useLocation()
   const pageTitle = routeTitles[location.pathname] || 'Console'
   const user = session?.user
+  const isAdmin = user?.type === 'administrator'
+  const visibleNavItems = navItems.filter((item) => !item.adminOnly || isAdmin)
 
   return (
     <div className="app-shell">
@@ -33,7 +35,7 @@ export default function AppShell({ session, onRefreshSession, onSignOut, childre
           </div>
         </div>
         <nav className="nav-list">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
