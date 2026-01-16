@@ -30,28 +30,6 @@ role-based access control to separate administrator, employee, and customer capa
 | View own packets | Yes | Yes | Yes |
 | Run reports / revenue | Yes | No | No |
 
-## Functional Requirements Mapping
-1) Registration and login: `Access` screen; `/authentication/*` endpoints.
-2) Role assignment: admin user management (`/admin/user/*`).
-3) CRUD:
-   - Company: `/company` (admin).
-   - Employees: `/admin/employee/*` (admin).
-   - Customers: `/customer/*` (staff).
-   - Offices: `/admin/office/*` (admin).
-   - Packets: `/packet/*` (staff).
-4) Employees register packets: `/packet/sending`, `/packet/receiving`.
-5) Reports:
-   - Employees: `/admin/employee`.
-   - Customers: `/customer`.
-   - All packets: `/packet/all`.
-   - Packets by employee: `/packet/all-from-employee/:id`.
-   - Not received: `/packet/not-received`.
-   - Sent by customer: `/packet/sent-by-customer/:id`.
-   - Received by customer: `/packet/received-by-customer/:id`.
-   - Revenue by period: `/packet/revenue?from=...&to=...`.
-6) Employees see all packets: `Packets` (staff view).
-7) Customers see only their packets: `/user/sent/packets`, `/user/received-packets`, `/user/expected-packets`.
-
 ## Data Model (Key Entities)
 - User: `email`, `password` (hashed), `egn` (encrypted), `isEmployee`, `type`.
 - Customer: `firstName`, `lastName`, `egn` (encrypted).
@@ -71,66 +49,217 @@ role-based access control to separate administrator, employee, and customer capa
 - Price is recalculated on updates if weight or delivery target changes.
 
 ## Backend Endpoints (Required by Assignment)
-Each endpoint below is required by the assignment and includes a short description of its role.
+Each endpoint below includes purpose, access, inputs, outputs, and a simple usage example.
 
 ### Authentication
-- POST `/authentication/signup` - Register a new user (email, password, EGN).
-- POST `/authentication/login` - Log in and attach the user to the session.
-- GET `/authentication` - Return current session user (used by the frontend to refresh state).
-- POST `/authentication/sign-out` - Clear the active session.
+
+**POST `/authentication/signup`**
+- Purpose: Register a new user.
+- Access: Public.
+- Body:
+  - `email` (string, required)
+  - `password` (string, required)
+  - `egn` (string, required)
+  - `userName` (string, optional)
+- Returns: `UserResponseDto` (id, email, userName, isEmployee, type).
+- Example:
+```bash
+curl -X POST http://localhost:3000/authentication/signup \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"a@b.com","password":"Str0ng!Pass","egn":"1234567890"}'
+```
+
+**POST `/authentication/login`**
+- Purpose: Log in and create a session for the user.
+- Access: Public.
+- Body: `email`, `password`.
+- Returns: `UserResponseDto` and sets session cookie.
+- Usage: call from the frontend and keep `credentials: 'include'` to store the session.
+
+**GET `/authentication`**
+- Purpose: Return current session data for UI refresh.
+- Access: Public (returns empty session if not logged in).
+- Returns: session object with `user` if logged in.
+
+**POST `/authentication/sign-out`**
+- Purpose: Clear current session.
+- Access: Authenticated.
 
 ### Role assignment (admin)
-- PATCH `/admin/user/:id` - Update user profile fields and `isEmployee`.
-- PATCH `/admin/user/user-access/:id` - Set access type (`administrator` or `regular`).
+
+**PATCH `/admin/user/:id`**
+- Purpose: Update user profile fields (email, userName, egn, isEmployee).
+- Access: Admin.
+- Body: any subset of updatable fields.
+- Returns: updated User.
+
+**PATCH `/admin/user/user-access/:id`**
+- Purpose: Set access type (`administrator` or `regular`).
+- Access: Admin.
+- Body: `{ "userAccessType": "administrator" | "regular" }`.
 
 ### Company (admin)
-- GET `/company` - Fetch the single company profile (or null if not set).
-- POST `/company` - Create the company profile.
-- PATCH `/company/:id` - Update the company profile.
-- DELETE `/company/:id` - Remove the company profile.
+
+**GET `/company`**
+- Purpose: Fetch the single company profile (null if not created).
+- Access: Admin.
+
+**POST `/company`**
+- Purpose: Create the company profile.
+- Access: Admin.
+- Body: `name`, `legalId?`, `address?`, `contact?`, `notes?`.
+
+**PATCH `/company/:id`**
+- Purpose: Update the company profile.
+- Access: Admin.
+
+**DELETE `/company/:id`**
+- Purpose: Remove the company profile.
+- Access: Admin.
 
 ### Employees (admin)
-- GET `/admin/employee` - List all employees.
-- GET `/admin/employee/:id` - Get employee details by ID.
-- POST `/admin/employee` - Create an employee (courier or office worker).
-- PATCH `/admin/employee/:id` - Update employee data.
-- DELETE `/admin/employee/:id` - Delete an employee.
+
+**GET `/admin/employee`**
+- Purpose: List all employees.
+- Access: Admin.
+
+**GET `/admin/employee/:id`**
+- Purpose: Fetch employee by ID.
+- Access: Admin.
+
+**POST `/admin/employee`**
+- Purpose: Create an employee.
+- Access: Admin.
+- Body: `firstName`, `lastName`, `type` (`courier` or `office worker`).
+
+**PATCH `/admin/employee/:id`**
+- Purpose: Update employee details.
+- Access: Admin.
+
+**DELETE `/admin/employee/:id`**
+- Purpose: Delete employee.
+- Access: Admin.
 
 ### Customers (staff)
-- GET `/customer` - List all customers.
-- GET `/customer/:id` - Get customer details by ID.
-- POST `/customer` - Create a customer.
-- PATCH `/customer/:id` - Update customer data.
-- DELETE `/customer/:id` - Delete a customer.
-- POST `/customer/egn` - Find customer by EGN.
-- GET `/customer/egn/:id` - Return the decrypted EGN for a customer.
+
+**GET `/customer`**
+- Purpose: List all customers.
+- Access: Employee/Admin.
+
+**GET `/customer/:id`**
+- Purpose: Fetch customer by ID.
+- Access: Employee/Admin.
+
+**POST `/customer`**
+- Purpose: Create a customer.
+- Access: Employee/Admin.
+- Body: `firstName`, `lastName`, `egn`.
+
+**PATCH `/customer/:id`**
+- Purpose: Update customer details.
+- Access: Employee/Admin.
+
+**DELETE `/customer/:id`**
+- Purpose: Delete customer.
+- Access: Employee/Admin.
+
+**POST `/customer/egn`**
+- Purpose: Find customer by EGN.
+- Access: Employee/Admin.
+- Body: `{ "egn": "..." }`.
+
+**GET `/customer/egn/:id`**
+- Purpose: Return decrypted EGN for customer by ID.
+- Access: Employee/Admin.
 
 ### Offices
-- GET `/office?city=...` - Search offices by city (authenticated).
-- GET `/admin/office/:id` - Get office details (admin).
-- POST `/admin/office/creation` - Create an office (admin).
-- PATCH `/admin/office/update/:id` - Update office data (admin).
-- DELETE `/admin/office/:id` - Delete an office (admin).
+
+**GET `/office?city=...`**
+- Purpose: Search offices by city.
+- Access: Authenticated.
+- Usage: `GET /office?city=Sofia`.
+
+**GET `/admin/office/:id`**
+- Purpose: Fetch office by ID.
+- Access: Admin.
+
+**POST `/admin/office/creation`**
+- Purpose: Create office.
+- Access: Admin.
+- Body: `city`, `street`, `streetNumber`.
+
+**PATCH `/admin/office/update/:id`**
+- Purpose: Update office.
+- Access: Admin.
+
+**DELETE `/admin/office/:id`**
+- Purpose: Delete office.
+- Access: Admin.
 
 ### Packets (staff)
-- POST `/packet/sending` - Register a sent packet (creates price and links sender/receiver).
-- PATCH `/packet/receiving` - Mark a packet as received at an office.
-- PATCH `/packet/:id` - Update packet data and recompute price.
-- DELETE `/packet/:id` - Delete a packet.
-- GET `/packet/:id` - Get packet details by ID.
-- GET `/packet/all` - List all packets.
+
+**POST `/packet/sending`**
+- Purpose: Register a sent packet.
+- Access: Employee/Admin.
+- Body: `senderId`, `receiverId`, `fromOfficeId`, `toOfficeId?`, `fromAdress?`, `toAdress?`, `weight`, `employeeId`.
+- Notes: price is computed server-side.
+
+**PATCH `/packet/receiving`**
+- Purpose: Mark a packet as received at an office.
+- Access: Employee/Admin.
+- Body: `{ "packageId": number, "officeId": number }`.
+
+**PATCH `/packet/:id`**
+- Purpose: Update packet fields and recompute price.
+- Access: Employee/Admin.
+
+**DELETE `/packet/:id`**
+- Purpose: Delete packet.
+- Access: Employee/Admin.
+
+**GET `/packet/:id`**
+- Purpose: Fetch packet by ID.
+- Access: Employee/Admin.
+
+**GET `/packet/all`**
+- Purpose: List all packets.
+- Access: Employee/Admin.
 
 ### Reports (admin/staff)
-- GET `/packet/all-from-employee/:id` - Packets registered by an employee.
-- GET `/packet/not-received` - Packets that are sent but not received.
-- GET `/packet/sent-by-customer/:id` - Packets sent by a customer.
-- GET `/packet/received-by-customer/:id` - Packets received by a customer.
-- GET `/packet/revenue?from=YYYY-MM-DD&to=YYYY-MM-DD` - Total revenue for a period.
+
+**GET `/packet/all-from-employee/:id`**
+- Purpose: Packets registered by a specific employee.
+- Access: Employee/Admin.
+
+**GET `/packet/not-received`**
+- Purpose: Packets that are sent but not received.
+- Access: Employee/Admin.
+
+**GET `/packet/sent-by-customer/:id`**
+- Purpose: Packets sent by a customer.
+- Access: Employee/Admin.
+
+**GET `/packet/received-by-customer/:id`**
+- Purpose: Packets received by a customer.
+- Access: Employee/Admin.
+
+**GET `/packet/revenue?from=YYYY-MM-DD&to=YYYY-MM-DD`**
+- Purpose: Total revenue for the selected period.
+- Access: Admin.
 
 ### Customer views (session user)
-- GET `/user/sent/packets` - Current user's sent packets.
-- GET `/user/received-packets` - Current user's received packets.
-- GET `/user/expected-packets` - Current user's expected packets.
+
+**GET `/user/sent/packets`**
+- Purpose: Current user's sent packets.
+- Access: Authenticated.
+
+**GET `/user/received-packets`**
+- Purpose: Current user's received packets.
+- Access: Authenticated.
+
+**GET `/user/expected-packets`**
+- Purpose: Current user's expected packets.
+- Access: Authenticated.
 
 ## Endpoint Code Excerpts
 Each required endpoint is shown below with a code excerpt from its controller.
