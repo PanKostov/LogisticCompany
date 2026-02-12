@@ -264,6 +264,329 @@ curl -X POST http://localhost:3000/authentication/signup \
 ## Endpoint Code Excerpts
 Each required endpoint is shown below with a code excerpt from its controller.
 
+## Request/Response Examples
+All protected endpoints require a valid session cookie (`credentials: 'include'` from the frontend).
+The JSON below uses representative fields to show how each endpoint is used.
+
+### Authentication
+
+POST `/authentication/signup`
+```json
+{
+  "email": "user@example.com",
+  "password": "Str0ng!Pass1",
+  "egn": "1234567890",
+  "userName": "Test User"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "userName": "Test User",
+  "isEmployee": false,
+  "type": "regular"
+}
+```
+
+POST `/authentication/login`
+```json
+{
+  "email": "user@example.com",
+  "password": "Str0ng!Pass1"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "userName": "Test User",
+  "isEmployee": false,
+  "type": "regular"
+}
+```
+
+GET `/authentication`
+Response:
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "userName": "Test User",
+    "isEmployee": false,
+    "type": "regular"
+  }
+}
+```
+
+POST `/authentication/sign-out`
+Response: empty 200/204.
+
+### Role assignment (admin)
+
+PATCH `/admin/user/:id`
+```json
+{
+  "userName": "Updated Name",
+  "isEmployee": true
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "userName": "Updated Name",
+  "egn": "1234567890",
+  "isEmployee": true,
+  "type": "regular"
+}
+```
+
+PATCH `/admin/user/user-access/:id`
+```json
+{
+  "userAccessType": "administrator"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "userName": "Updated Name",
+  "egn": "1234567890",
+  "isEmployee": true,
+  "type": "administrator"
+}
+```
+
+### Company (admin)
+
+GET `/company`
+Response:
+```json
+{
+  "id": 1,
+  "name": "Logistic Company Ltd",
+  "legalId": "BG123456789",
+  "address": "Sofia, Main Str 1",
+  "contact": "+359 88 123 4567",
+  "notes": "Working hours 9-18"
+}
+```
+
+POST `/company`
+```json
+{
+  "name": "Logistic Company Ltd",
+  "legalId": "BG123456789",
+  "address": "Sofia, Main Str 1",
+  "contact": "+359 88 123 4567",
+  "notes": "Working hours 9-18"
+}
+```
+Response: company object (same shape as above).
+
+PATCH `/company/:id`
+```json
+{
+  "contact": "+359 88 777 8888",
+  "notes": "Updated contact info"
+}
+```
+Response: updated company object.
+
+DELETE `/company/:id`
+Response: deleted company object.
+
+### Employees (admin)
+
+GET `/admin/employee`
+Response:
+```json
+[
+  { "id": 1, "firstName": "Ivan", "lastName": "Petrov", "type": "courier" },
+  { "id": 2, "firstName": "Maria", "lastName": "Georgieva", "type": "office worker" }
+]
+```
+
+GET `/admin/employee/:id`
+Response:
+```json
+{ "id": 1, "firstName": "Ivan", "lastName": "Petrov", "type": "courier" }
+```
+
+POST `/admin/employee`
+```json
+{ "firstName": "Ivan", "lastName": "Petrov", "type": "courier" }
+```
+Response: created employee object.
+
+PATCH `/admin/employee/:id`
+```json
+{ "lastName": "Petrova", "type": "office worker" }
+```
+Response: updated employee object.
+
+DELETE `/admin/employee/:id`
+Response: deleted employee object.
+
+### Customers (staff)
+
+GET `/customer`
+Response:
+```json
+[
+  { "id": 1, "firstName": "Georgi", "lastName": "Ivanov", "egn": "1111111111" }
+]
+```
+
+GET `/customer/:id`
+Response:
+```json
+{ "id": 1, "firstName": "Georgi", "lastName": "Ivanov", "egn": "1111111111" }
+```
+
+POST `/customer`
+```json
+{ "firstName": "Georgi", "lastName": "Ivanov", "egn": "1111111111" }
+```
+Response: created customer object.
+
+PATCH `/customer/:id`
+```json
+{ "lastName": "Ivanova" }
+```
+Response: updated customer object.
+
+DELETE `/customer/:id`
+Response: deleted customer object.
+
+POST `/customer/egn`
+```json
+{ "egn": "1111111111" }
+```
+Response: customer object.
+
+GET `/customer/egn/:id`
+Response:
+```json
+"1111111111"
+```
+
+### Offices
+
+GET `/office?city=Sofia`
+Response:
+```json
+[
+  { "id": 1, "city": "Sofia", "street": "Main", "streetNumber": 1 }
+]
+```
+
+GET `/admin/office/:id`
+Response:
+```json
+{ "id": 1, "city": "Sofia", "street": "Main", "streetNumber": 1 }
+```
+
+POST `/admin/office/creation`
+```json
+{ "city": "Sofia", "street": "Main", "streetNumber": 1 }
+```
+Response: created office object.
+
+PATCH `/admin/office/update/:id`
+```json
+{ "street": "Second", "streetNumber": 22 }
+```
+Response: updated office object.
+
+DELETE `/admin/office/:id`
+Response: deleted office object.
+
+### Packets (staff)
+
+POST `/packet/sending`
+```json
+{
+  "senderId": 1,
+  "receiverId": 2,
+  "fromOfficeId": 1,
+  "toOfficeId": 2,
+  "fromAdress": "Sofia, Main 1",
+  "toAdress": "Plovdiv, Center 5",
+  "weight": 3.5,
+  "employeeId": 1
+}
+```
+Response (shortened):
+```json
+{
+  "id": 10,
+  "weight": 3.5,
+  "price": 12.0,
+  "employeeId": 1,
+  "isReceived": false
+}
+```
+
+PATCH `/packet/receiving`
+```json
+{ "packageId": 10, "officeId": 2 }
+```
+Response: updated packet object with `isReceived: true`.
+
+PATCH `/packet/:id`
+```json
+{ "weight": 4.2, "toAdress": "Plovdiv, Center 7" }
+```
+Response: updated packet with recalculated `price`.
+
+DELETE `/packet/:id`
+Response: deleted packet object.
+
+GET `/packet/:id`
+Response: packet object.
+
+GET `/packet/all`
+Response: array of packet objects.
+
+### Reports (admin/staff)
+
+GET `/packet/all-from-employee/:id`
+Response: array of packet objects for the employee.
+
+GET `/packet/not-received`
+Response: array of packet objects with `isReceived = false`.
+
+GET `/packet/sent-by-customer/:id`
+Response: array of packet objects sent by the customer.
+
+GET `/packet/received-by-customer/:id`
+Response: array of packet objects received by the customer.
+
+GET `/packet/revenue?from=2024-01-01&to=2024-01-31`
+Response:
+```json
+{ "total": 245.5, "from": "2024-01-01", "to": "2024-01-31" }
+```
+
+### Customer views (session user)
+
+GET `/user/sent/packets`
+Response: array of the current user's sent packets.
+
+GET `/user/received-packets`
+Response: array of the current user's received packets.
+
+GET `/user/expected-packets`
+Response: array of the current user's expected packets.
+
 ### Authentication
 Creates user accounts and attaches the authenticated user to the session.
 ```ts
