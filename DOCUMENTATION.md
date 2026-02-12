@@ -819,5 +819,4 @@ All tasks and features were implemented by a single contributor:
 - Pricing and revenue calculation logic.
 - Documentation and project structure.
 
-## Known Limitations
-- Internet Explorer support is not implemented (modern browsers only).
+
